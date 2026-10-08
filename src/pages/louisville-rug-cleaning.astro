@@ -217,17 +217,15 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
 
   .c-main-grid {
     display: grid;
-    gap: 3rem 4.5rem;
-    align-items: start;
+    gap: 3rem 4rem;
+    align-items: center;
   }
   @media (min-width: 1024px) {
     .c-main-grid {
-      grid-template-columns: 1.05fr 0.95fr;
+      grid-template-columns: 1fr 1fr;
     }
     .c-form {
       order: 2;
-      position: sticky;
-      top: calc(var(--header-h) + 1.5rem);
     }
   }
   .c-blocks {
@@ -259,9 +257,30 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
   .c-notes {
     display: grid;
     gap: 1.5rem;
+    grid-auto-rows: 1fr; /* both notes the same height */
   }
   .note {
     padding: clamp(1.5rem, 3vw, 2.25rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  /* photo matches the height of the two notes */
+  @media (min-width: 900px) {
+    .c-care .split {
+      align-items: stretch;
+    }
+    .c-care .split-media {
+      position: relative;
+      min-height: 100%;
+    }
+    .c-care .split-media :global(img) {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      aspect-ratio: auto;
+    }
   }
   .note h2 {
     font-size: clamp(1.9rem, 1.5rem + 1.2vw, 2.5rem);

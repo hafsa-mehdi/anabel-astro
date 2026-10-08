@@ -30,7 +30,7 @@ const dateText = date.toLocaleDateString('en-US', { year: 'numeric', month: 'lon
           src={post.data.heroImage}
           alt={post.data.heroAlt}
           widths={[480, 640, 800, 1200, 1600]}
-          sizes="(min-width: 1280px) 1200px, 100vw"
+          sizes="(min-width: 900px) 832px, 100vw"
           loading="eager"
           fetchpriority="high"
           format="webp"
@@ -91,11 +91,12 @@ const dateText = date.toLocaleDateString('en-US', { year: 'numeric', month: 'lon
     }
   }
   .post-hero {
+    max-width: calc(52rem + 2 * var(--gutter));
     margin: 0 auto clamp(2.5rem, 5vw, 4rem);
   }
   .post-hero :global(img) {
     width: 100%;
-    max-height: 36rem;
+    max-height: 26rem;
     object-fit: cover;
     border-radius: var(--radius);
     border: 1px solid var(--line);
@@ -108,6 +109,9 @@ const dateText = date.toLocaleDateString('en-US', { year: 'numeric', month: 'lon
   .post-body :global(p),
   .post-body :global(li) {
     color: #ddd4c5;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
   }
   .post-cta {
     max-width: calc(52rem + 2 * var(--gutter));

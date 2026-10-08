@@ -130,6 +130,28 @@ const storySizes = '(min-width: 1024px) 40vw, min(20rem, 90vw)';
   .t-photo :global(img) {
     aspect-ratio: 4 / 5;
   }
+  /* on computers the photo is exactly as tall as the story beside it */
+  @media (min-width: 1024px) {
+    .t-story-grid {
+      align-items: stretch;
+    }
+    .t-photo {
+      position: relative;
+      min-height: 26rem;
+    }
+    .t-photo :global(img) {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+      object-fit: cover;
+      object-position: 50% 30%;
+    }
+    .t-story-text {
+      align-self: center;
+    }
+  }
   .t-story-text h2 {
     margin-bottom: 1rem;
   }

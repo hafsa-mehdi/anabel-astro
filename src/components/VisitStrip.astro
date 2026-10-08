@@ -51,6 +51,11 @@ const s = await getSettings();
   .visit-strip {
     padding-top: 0;
   }
+  /* after a section with its own background, leave clear space instead of touching its edge */
+  :global(.bg-linen) + .visit-strip,
+  :global(.bg-wool) + .visit-strip {
+    padding-top: clamp(3.5rem, 7vw, 6rem);
+  }
   .strip {
     display: grid;
     gap: 2rem 4rem;

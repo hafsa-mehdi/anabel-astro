@@ -125,12 +125,34 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
   }
   .d-grid {
     display: grid;
-    gap: 3rem 4.5rem;
-    align-items: start;
+    gap: 3rem 4rem;
+    align-items: stretch;
   }
   @media (min-width: 1024px) {
     .d-grid {
       grid-template-columns: 1fr 1fr;
+    }
+    /* benefits + photo column ends exactly where the application card ends */
+    .d-benefits {
+      display: flex;
+      flex-direction: column;
+    }
+    .d-detail {
+      position: relative;
+      flex: 1;
+      min-height: 14rem;
+      max-width: none !important;
+    }
+    .d-detail :global(img) {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .d-form,
+    .d-form :global(.apply) {
+      height: 100%;
     }
   }
   .benefits {

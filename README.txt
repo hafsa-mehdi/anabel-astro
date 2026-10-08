@@ -121,8 +121,9 @@ Tips
 ---------------------------------
 - Home hero: the rug unrolls in 3D (three.js) and tilts with the mouse.
   It loads after the page is ready, on screens 768px and wider.
-- Home cleaning steps: on computers the section stays on screen while you
-  scroll, each step lights up and a second 3D rug unrolls step by step.
+- Home cleaning steps: all five steps show at once (same as on phones);
+  on computers a second 3D rug unrolls in one smooth motion when the
+  section scrolls into view.
 - Map (Home and Visit page): MapLibre with free OpenFreeMap tiles (no API
   key). It loads only when you scroll to it, shows nearby towns, then flies
   to the showroom and slowly circles it.

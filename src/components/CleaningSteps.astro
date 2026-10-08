@@ -1,7 +1,7 @@
 ---
-// Homepage cleaning process. On computers the section stays pinned while you scroll,
-// each step lights up in turn and a 3D rug unrolls a little more for every step.
-// Phones, reduced-motion users and browsers without WebGL get a simple list and a still rug.
+// Homepage cleaning process: all five steps are shown at once (same as on phones).
+// On computers a 3D rug unrolls in one smooth motion when the section comes into view.
+// Phones, reduced-motion users and browsers without WebGL get a still, unrolled rug.
 import { accent } from '../lib/cms';
 
 interface Props {
@@ -23,7 +23,7 @@ const { label, heading, steps, primary, secondary } = Astro.props;
         <ol class="plist">
           {
             steps.map((st, i) => (
-              <li style={`--i:${i}`}>
+              <li data-reveal style={`--i:${i}`}>
                 <span class="n" aria-hidden="true">
                   {i + 1}
                 </span>
@@ -91,63 +91,47 @@ const { label, heading, steps, primary, secondary } = Astro.props;
     const section = document.querySelector<HTMLElement>('[data-steps]');
     if (!section || section.dataset.ready) return;
     section.dataset.ready = '1';
-    const items = [...section.querySelectorAll<HTMLLIElement>('.plist li')];
     const stage = section.querySelector<HTMLElement>('[data-steps-stage]')!;
+    const stillRug = () => stage.querySelector('source')?.remove();
     const wanted =
       window.matchMedia('(min-width: 1024px) and (prefers-reduced-motion: no-preference)').matches && hasWebGL();
-    if (!wanted) {
-      stage.querySelector('source')?.remove();
-      items.forEach((li) => li.classList.add('on'));
-      return;
-    }
-    section.classList.add('is-pinned');
+    if (!wanted) return stillRug();
 
-    let target = 0;
-    let current = 0;
-    let ticking = false;
-    const follow = () => {
-      current += (target - current) * 0.07; // glide toward the scroll position
-      if (Math.abs(target - current) < 0.0008) current = target;
-      rug?.setT(0.15 + current * 0.85);
-      ticking = current !== target;
-      if (ticking) requestAnimationFrame(follow);
-    };
-    const onScroll = () => {
-      const r = section.getBoundingClientRect();
-      const raw = -r.top / Math.max(1, r.height - window.innerHeight);
-      target = Math.min(1, Math.max(0, (raw - 0.05) / 0.85));
-      items.forEach((li, i) => li.classList.toggle('on', target >= i / items.length));
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(follow);
-      }
-    };
-
-    // Load three.js only when the section gets close
-    const io = new IntersectionObserver(
-      async ([entry]) => {
-        if (!entry.isIntersecting) return;
-        io.disconnect();
+    // Fetch three.js a little before the section arrives...
+    let mod: Promise<typeof import('../scripts/rug3d')> | null = null;
+    const preload = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        preload.disconnect();
+        mod = import('../scripts/rug3d');
+      },
+      { rootMargin: '800px 0px' },
+    );
+    // ...then unroll the rug in one smooth motion once it is well in view
+    const play = new IntersectionObserver(
+      async ([e]) => {
+        if (!e.isIntersecting) return;
+        play.disconnect();
         try {
-          const { mountRug } = await import('../scripts/rug3d');
+          const { mountRug } = await (mod ?? import('../scripts/rug3d'));
           if (!stage.isConnected) return;
-          rug = mountRug(stage, { manual: true, startT: 0.15, onReady: () => stage.classList.add('is-live') });
-          onScroll();
+          rug = mountRug(stage, {
+            startT: 0.15,
+            delay: 250,
+            duration: 3000,
+            onReady: () => stage.classList.add('is-live'),
+          });
         } catch {
-          // keep a still image and the plain list
-          stage.querySelector('source')?.remove();
-          section.classList.remove('is-pinned');
-          items.forEach((li) => li.classList.add('on'));
+          stillRug();
         }
       },
-      { rootMargin: '600px 0px' },
+      { threshold: 0.45 },
     );
-    io.observe(section);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    preload.observe(section);
+    play.observe(stage);
     cleanup = () => {
-      io.disconnect();
-      window.removeEventListener('scroll', onScroll);
+      preload.disconnect();
+      play.disconnect();
       rug?.dispose();
       rug = null;
     };
@@ -175,29 +159,7 @@ const { label, heading, steps, primary, secondary } = Astro.props;
   }
   @media (min-width: 1024px) {
     .steps-grid {
-      grid-template-columns: 0.9fr 1.1fr;
-    }
-    /* Pinned scroll version (added by the script on computers) */
-    .steps-section.is-pinned {
-      height: 400vh;
-      padding: 0;
-    }
-    .is-pinned h2 {
-      font-size: clamp(2.2rem, 1.4rem + 2vw, 3.3rem);
-    }
-    .is-pinned .plist {
-      margin-block: 1rem 1.5rem;
-    }
-    .is-pinned .plist li {
-      padding-block: 0.3rem;
-    }
-    .is-pinned .pin {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      padding-top: var(--header-h);
+      grid-template-columns: 1fr 1fr;
     }
   }
   .plist {
@@ -213,12 +175,6 @@ const { label, heading, steps, primary, secondary } = Astro.props;
     gap: 1rem;
     align-items: start;
     padding: 0.45rem 0;
-    opacity: 0.35;
-    transition: opacity 0.5s ease, transform 0.6s var(--ease);
-  }
-  .plist li.on {
-    opacity: 1;
-    transform: translateX(8px);
   }
   .n {
     width: 2.75rem;
@@ -233,7 +189,7 @@ const { label, heading, steps, primary, secondary } = Astro.props;
     color: var(--gold);
     transition: background-color 0.4s ease, color 0.4s ease;
   }
-  li.on .n {
+  .plist li:hover .n {
     background: var(--gold);
     color: var(--bg);
   }

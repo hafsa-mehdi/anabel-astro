@@ -102,6 +102,11 @@ const explore = [
   .site-footer a:hover {
     color: var(--gold);
   }
+  /* footer content runs across the full width of the screen */
+  .site-footer .wrap {
+    max-width: none;
+    padding-inline: clamp(1.25rem, 5vw, 5rem);
+  }
   .footer-grid {
     display: grid;
     gap: 2.5rem 2rem;
@@ -114,7 +119,10 @@ const explore = [
   }
   @media (min-width: 1024px) {
     .footer-grid {
-      grid-template-columns: 1.4fr 1fr 1fr 0.9fr;
+      /* columns spread edge to edge: logo on the far left, Explore on the far right */
+      grid-template-columns: auto auto minmax(17rem, 22rem) auto;
+      justify-content: space-between;
+      gap: 2.5rem clamp(2rem, 3vw, 5rem);
     }
   }
   .f-logo {
@@ -215,5 +223,9 @@ const explore = [
   }
   .f-legal p {
     margin: 0;
+  }
+  .f-hours dt,
+  .f-hours dd {
+    white-space: nowrap;
   }
 </style>
