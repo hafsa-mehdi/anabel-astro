@@ -10,7 +10,7 @@ hero:
     Handmade rugs hand-picked by Anabel, gentle hand-washed cleaning and expert
     repair, all under one roof.
   primary:
-    label: 'Book cleaning: 15% off'
+    label: 'Book cleaning: 25% off'
     url: /contact/#book
   secondary:
     label: Browse rugs
@@ -32,7 +32,6 @@ services:
       text: >-
         Take a rug home with no obligation. Sometimes seeing it in your own room
         is the only way to know. White glove delivery and installation included.
-      tag: ''
       image: /images/uploads/home/services/cards/0/image.webp
       imageAlt: >-
         Living room with white sofas, green armchairs and a large blue and white
@@ -41,10 +40,10 @@ services:
         label: Call to schedule a home trial
         url: tel:+15028959595
     - title: Rug cleaning
+      tag: 15% off
       text: >-
         Hand-washed with a wool-safe shampoo. No steam, no harsh chemicals, and
         colors tested before we start.
-      tag: 15% off
       image: /images/uploads/home/services/cards/1/image.webp
       imageAlt: A technician hand-washing a red oriental rug on the wash floor
       link:
@@ -54,9 +53,10 @@ services:
       text: >-
         Holes and tears, fringe, edges, faded color and water damage, mended by
         hand with matching threads.
-      tag: ''
       image: /images/uploads/home/services/cards/2/image.webp
-      imageAlt: Hands re-weaving the border of a navy and red oriental rug, with spools of thread beside it
+      imageAlt: >-
+        Hands re-weaving the border of a navy and red oriental rug, with spools
+        of thread beside it
       link:
         label: See repairs
         url: /hole-or-tear-repair/
