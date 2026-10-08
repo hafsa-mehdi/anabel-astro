@@ -1,0 +1,134 @@
+---
+// Template for blog posts (src/content/posts/*.md).
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import RelatedLinks from './RelatedLinks.astro';
+import { mustRead } from '../lib/cms';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  related: { label: string; url: string; text: string }[];
+}
+const { post, related } = Astro.props;
+const { Content } = await render(post);
+const home = await mustRead('home');
+const cleaning = await mustRead('cleaning');
+const date = post.data.pubDate;
+const dateText = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+---
+
+<article class="post">
+  <header class="wrap post-head">
+    <p class="label post-date"><time datetime={date.toISOString().slice(0, 10)}>{dateText}</time></p>
+    <h1>{post.data.title}</h1>
+  </header>
+  {
+    post.data.heroImage && (
+      <figure class="wrap post-hero">
+        <Image
+          src={post.data.heroImage}
+          alt={post.data.heroAlt}
+          widths={[480, 640, 800, 1200, 1600]}
+          sizes="(min-width: 1280px) 1200px, 100vw"
+          loading="eager"
+          fetchpriority="high"
+          format="webp"
+          quality={62}
+        />
+      </figure>
+    )
+  }
+  <div class="wrap">
+    <div class="prose post-body">
+      <Content />
+    </div>
+  </div>
+
+  <aside class="wrap post-cta" aria-labelledby="post-cta-title">
+    <div class="post-cta-box" data-reveal>
+      <h2 id="post-cta-title">{cleaning.form.heading}</h2>
+      <p>{cleaning.lead}</p>
+      <div class="btn-row">
+        <a class="btn" href="/louisville-rug-cleaning/#book" data-astro-prefetch="hover">{home.cleaning.primary.label}</a>
+        <a class="btn btn-quiet" href="/louisville-rug-cleaning/" data-astro-prefetch="hover">{home.cleaning.secondary.label}</a>
+      </div>
+    </div>
+  </aside>
+</article>
+
+<RelatedLinks heading="Also from Anabel's" links={related} />
+
+<style>
+  .post-head {
+    max-width: calc(52rem + 2 * var(--gutter));
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+    text-align: center;
+  }
+  .post-head h1 {
+    font-size: clamp(2.5rem, 1.5rem + 3.6vw, 4.6rem);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .post-head > * {
+      animation: p-rise 1s var(--ease) both;
+    }
+    .post-head h1 {
+      animation-delay: 0.08s;
+    }
+    .post-hero {
+      animation: p-fade 1.2s ease 0.2s both;
+    }
+  }
+  @keyframes p-rise {
+    from {
+      transform: translateY(22px);
+    }
+  }
+  @keyframes p-fade {
+    from {
+      transform: scale(1.02);
+    }
+  }
+  .post-hero {
+    margin: 0 auto clamp(2.5rem, 5vw, 4rem);
+  }
+  .post-hero :global(img) {
+    width: 100%;
+    max-height: 36rem;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+  .post-body {
+    margin-inline: auto;
+    max-width: 44rem;
+    font-size: 1.1rem;
+  }
+  .post-body :global(p),
+  .post-body :global(li) {
+    color: #ddd4c5;
+  }
+  .post-cta {
+    max-width: calc(52rem + 2 * var(--gutter));
+    padding-block: 4rem 0;
+  }
+  .post-cta-box {
+    text-align: center;
+    padding: clamp(2rem, 5vw, 3.25rem);
+    border-radius: 28px;
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 15% 20%, rgba(163, 58, 46, 0.35), transparent 55%),
+      radial-gradient(circle at 85% 80%, rgba(43, 74, 117, 0.45), transparent 55%),
+      var(--panel);
+  }
+  .post-cta-box p {
+    color: var(--muted);
+    max-width: 46ch;
+    margin: 0 auto 1.6rem;
+  }
+  .post-cta-box .btn-row {
+    justify-content: center;
+  }
+</style>

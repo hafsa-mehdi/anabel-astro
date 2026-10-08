@@ -1,0 +1,267 @@
+---
+// Shared booking form. Sends JSON to the "Booking form destination" set in
+// Keystatic → Site-wide → Site settings (for example an n8n webhook).
+import { getSettings, telHref } from '../lib/cms';
+
+interface Props {
+  heading: string;
+  intro?: string | null;
+  id?: string;
+  source: string;
+  /** Ask for a ZIP code (service-area pages) */
+  zip?: boolean;
+}
+const { heading, intro, id = 'book', source, zip = false } = Astro.props;
+const s = await getSettings();
+const endpoint = (s.formEndpoint ?? '').trim();
+const uid = `${id}-form`;
+const counts = ['1', '2', '3', '4', '5+'];
+---
+
+<section class="booking" id={id} aria-labelledby={`${uid}-title`}>
+  <h2 id={`${uid}-title`} class="booking-title">{heading}</h2>
+  {intro && <p class="booking-intro">{intro}</p>}
+
+  <form
+    class="booking-form"
+    data-booking-form
+    data-endpoint={endpoint}
+    data-phone={s.phone}
+    data-email={s.email}
+    action={endpoint || undefined}
+    method="post"
+    novalidate
+  >
+    <input type="hidden" name="source" value={source} />
+    <input type="hidden" name="offer" value="15% off rug cleaning" />
+    <div class="hp" aria-hidden="true">
+      <label for={`${uid}-website`}>Leave this field empty</label>
+      <input id={`${uid}-website`} name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for={`${uid}-name`}>Your name</label>
+        <input id={`${uid}-name`} name="name" type="text" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for={`${uid}-phone`}>Phone</label>
+        <input id={`${uid}-phone`} name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
+      </div>
+    </div>
+    <div class:list={[{ 'grid-2': zip }]}>
+      <div class="field">
+        <label for={`${uid}-email`}>Email</label>
+        <input id={`${uid}-email`} name="email" type="email" autocomplete="email" required />
+      </div>
+      {
+        zip && (
+          <div class="field">
+            <label for={`${uid}-zip`}>ZIP code</label>
+            <input id={`${uid}-zip`} name="zip" type="text" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}" />
+          </div>
+        )
+      }
+    </div>
+
+    <fieldset class="field rugs">
+      <legend>Number of rugs</legend>
+      <div class="rug-count">
+        {
+          counts.map((c, i) => (
+            <label>
+              <input type="radio" name="rugs" value={c} required={i === 0} checked={i === 0} />
+              <span>{c}</span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <div class="field">
+      <label for={`${uid}-message`}>Message <span class="hint">(optional)</span></label>
+      <textarea id={`${uid}-message`} name="message" rows="3" placeholder="Rug sizes, stains, repairs or a good time to call"
+      ></textarea>
+    </div>
+
+    <button class="btn submit" type="submit">Send my booking request</button>
+    <p class="status" role="status" aria-live="polite"></p>
+    <p class="alt">
+      Prefer to talk? Call <a href={telHref(s.phone)}>{s.phone}</a>.
+    </p>
+    {import.meta.env.DEV && !endpoint && <p class="dev-note">Developer note: no form destination is set in Site settings yet.</p>}
+  </form>
+</section>
+
+<script>
+  function initForms() {
+    document.querySelectorAll<HTMLFormElement>('form[data-booking-form]').forEach((form) => {
+      if (form.dataset.ready) return;
+      form.dataset.ready = '1';
+      const status = form.querySelector<HTMLElement>('.status')!;
+      const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+      const say = (msg: string, kind: 'ok' | 'error' | 'info') => {
+        status.textContent = msg;
+        status.dataset.kind = kind;
+      };
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+        const data = Object.fromEntries(new FormData(form).entries());
+        if (data.website) return; // spam trap
+        delete data.website;
+
+        const endpoint = form.dataset.endpoint;
+        if (!endpoint) {
+          say(
+            `This form is not connected yet, so your request was not sent. Please call ${form.dataset.phone} or email ${form.dataset.email}.`,
+            'error',
+          );
+          return;
+        }
+        button.disabled = true;
+        say('Sending…', 'info');
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, page: location.pathname, sentAt: new Date().toISOString() }),
+          });
+          if (!res.ok) throw new Error(String(res.status));
+          form.reset();
+          say('Thank you! Your request was sent. We will be in touch soon.', 'ok');
+        } catch {
+          say(`Sorry, something went wrong. Please call ${form.dataset.phone} and we will book it by phone.`, 'error');
+        } finally {
+          button.disabled = false;
+        }
+      });
+    });
+  }
+  initForms();
+  document.addEventListener('astro:page-load', initForms);
+</script>
+
+<style>
+  .booking {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(1.4rem, 4vw, 2.4rem);
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+    overflow: hidden;
+  }
+  .booking::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, var(--madder), var(--gold));
+  }
+  .booking-title {
+    font-size: clamp(1.9rem, 1.4rem + 1.4vw, 2.6rem);
+    margin-bottom: 0.3rem;
+  }
+  .booking-intro {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .grid-2 {
+    display: grid;
+    gap: 0 1rem;
+  }
+  @media (min-width: 560px) {
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  fieldset.rugs {
+    border: 0;
+    padding: 0;
+    margin: 0 0 1rem;
+    min-width: 0;
+  }
+  fieldset.rugs legend {
+    padding: 0;
+    margin-bottom: 0.4rem;
+  }
+  .rug-count {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+  }
+  .rug-count label {
+    position: relative;
+    display: block;
+  }
+  .rug-count input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .rug-count span {
+    display: grid;
+    place-items: center;
+    min-height: 2.9rem;
+    font-weight: 800;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .rug-count label:hover span {
+    border-color: var(--gold);
+  }
+  .rug-count input:checked + span {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
+  }
+  .rug-count input:focus-visible + span {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .submit {
+    width: 100%;
+    margin-top: 0.4rem;
+  }
+  .status:empty {
+    display: none;
+  }
+  .status {
+    margin: 1rem 0 0;
+    padding: 0.8rem 1rem;
+    font-weight: 650;
+    background: rgba(243, 237, 226, 0.05);
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+  }
+  .status[data-kind='error'] {
+    border-left-color: #d0614f;
+  }
+  .status[data-kind='ok'] {
+    border-left-color: #6fae7c;
+  }
+  .alt {
+    margin-top: 1rem;
+    font-size: 0.94rem;
+    color: var(--muted);
+  }
+  .dev-note {
+    font-size: 0.85rem;
+    color: #e08b7d;
+  }
+</style>

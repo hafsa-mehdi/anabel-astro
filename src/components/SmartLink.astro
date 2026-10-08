@@ -1,0 +1,27 @@
+---
+// A link that marks itself as external when it leaves this site.
+// External links get a small icon and screen-reader text, and open in the same tab.
+import Icon from './Icon.astro';
+import { isExternal } from '../lib/cms';
+
+interface Props {
+  href: string;
+  class?: string;
+  showIcon?: boolean;
+  [key: string]: any;
+}
+const { href, class: className, showIcon = true, ...rest } = Astro.props;
+const external = isExternal(href);
+const toLiveSite = href.startsWith('https://anabelsorientalrugs.com');
+---
+
+<a href={href} class={className} {...rest} data-astro-prefetch={external ? undefined : 'hover'}>
+  <slot />{
+    external && showIcon && (
+      <>
+        <Icon name="external" class="ext-icon" />
+        <span class="sr-only">{toLiveSite ? '(opens our main website)' : '(opens another website)'}</span>
+      </>
+    )
+  }
+</a>

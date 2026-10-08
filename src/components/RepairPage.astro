@@ -1,0 +1,213 @@
+---
+// Template for every entry in Keystatic → Repairs → Repair pages.
+import Img from './Img.astro';
+import Icon from './Icon.astro';
+import RelatedLinks from './RelatedLinks.astro';
+import VisitStrip from './VisitStrip.astro';
+import BookingForm from './BookingForm.astro';
+import { getSettings, mustRead, telHref, imageInfo } from '../lib/cms';
+
+interface Props {
+  slug: string;
+  entry: {
+    title: string;
+    intro: string;
+    included: readonly string[];
+    heroImage: string | null;
+    heroAlt: string;
+    ctaHeading: string;
+    ctaText: string;
+    formHeading?: string;
+    formIntro?: string;
+  };
+  bodyHtml: string;
+  related: { label: string; url: string; text: string }[];
+}
+const { entry, bodyHtml, related } = Astro.props;
+const s = await getSettings();
+const home = await mustRead('home');
+const hero = imageInfo(entry.heroImage);
+---
+
+<section class="r-hero" aria-labelledby="r-title">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="wrap r-hero-grid">
+    <div class="r-text">
+      <p class="label">Rug repair</p>
+      <h1 id="r-title">{entry.title}</h1>
+      <p class="lead">{entry.intro}</p>
+      <div class="btn-row">
+        <a class="btn" href={telHref(s.phone)}><Icon name="phone" /> Call about a repair</a>
+        <a class="btn btn-quiet" href="/contact/" data-astro-prefetch="hover">Visit the showroom</a>
+      </div>
+    </div>
+    {
+      hero && (
+        <figure class="photo r-media">
+          <Img src={entry.heroImage} alt={entry.heroAlt} sizes="(min-width: 1024px) 50vw, 100vw" priority />
+        </figure>
+      )
+    }
+  </div>
+</section>
+
+<section class="section r-body bg-linen">
+  <div class="wrap r-body-grid">
+    {
+      entry.included.length > 0 && (
+        <aside class="r-included panel" aria-labelledby="included-title" data-reveal>
+          <h2 id="included-title">What's included</h2>
+          <ul class="knots">
+            {entry.included.map((i) => (
+              <li>{i}</li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+    <div class="prose" set:html={bodyHtml} data-reveal />
+  </div>
+</section>
+
+<section class="section r-cta" aria-labelledby="r-cta-title">
+  <div class="wrap r-cta-grid">
+    <div class="r-cta-inner" data-reveal>
+      <h2 id="r-cta-title">{entry.ctaHeading}</h2>
+      <p class="muted">{entry.ctaText}</p>
+      <div class="btn-row">
+        <a class="btn" href={telHref(s.phone)}><Icon name="phone" /> {s.phone}</a>
+        <a class="btn btn-quiet" href={s.directionsUrl ?? '/contact/'}>Get directions</a>
+      </div>
+    </div>
+    <BookingForm
+      heading={entry.formHeading || 'Book now and get 15% off'}
+      intro={entry.formIntro}
+      source={`Repair page: ${entry.title}`}
+    />
+  </div>
+</section>
+
+<RelatedLinks heading="Also from Anabel's" links={related} />
+
+<VisitStrip label={home.visit.label} heading={home.visit.heading} intro={home.visit.intro} />
+
+<style>
+  .r-hero {
+    position: relative;
+    overflow-x: clip;
+    padding-block: 1.5rem clamp(3.5rem, 7vw, 6rem);
+    isolation: isolate;
+  }
+  .glow {
+    position: absolute;
+    inset: -10% -10% 0 30%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgba(163, 58, 46, 0.32), transparent 70%),
+      radial-gradient(closest-side at 80% 30%, rgba(138, 100, 32, 0.35), transparent 70%);
+    pointer-events: none;
+  }
+  .r-hero-grid {
+    display: grid;
+    gap: 2.5rem 4.5rem;
+    align-items: center;
+    padding-top: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .r-hero-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .r-hero h1 {
+    font-size: clamp(2.8rem, 1.6rem + 4vw, 5.2rem);
+  }
+  .r-hero .lead {
+    max-width: 44ch;
+    margin-bottom: 1.9rem;
+  }
+  .r-media :global(img) {
+    aspect-ratio: 16 / 11;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .r-text > * {
+      animation: r-rise 1s var(--ease) both;
+    }
+    .r-text > :nth-child(2) {
+      animation-delay: 0.06s;
+    }
+    .r-text > :nth-child(3) {
+      animation-delay: 0.16s;
+    }
+    .r-text > :nth-child(4) {
+      animation-delay: 0.26s;
+    }
+    .r-media {
+      animation: r-fade 1.2s ease 0.2s both;
+    }
+  }
+  @keyframes r-rise {
+    from {
+      transform: translateY(24px);
+    }
+  }
+  @keyframes r-fade {
+    from {
+      transform: scale(1.03);
+    }
+  }
+  .r-body-grid {
+    display: grid;
+    gap: 2.5rem 5rem;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .r-body-grid {
+      grid-template-columns: 0.8fr 1.2fr;
+    }
+    .r-included {
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem);
+    }
+  }
+  .r-included {
+    padding: 1.9rem;
+  }
+  .r-included h2 {
+    font-size: 2rem;
+  }
+  .r-body .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .r-cta-inner {
+    display: grid;
+    gap: 1.5rem 3rem;
+    align-items: center;
+    padding: clamp(1.75rem, 4vw, 3.25rem);
+    border-radius: 28px;
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 15% 20%, rgba(163, 58, 46, 0.35), transparent 55%),
+      radial-gradient(circle at 85% 80%, rgba(43, 74, 117, 0.45), transparent 55%),
+      var(--panel);
+  }
+  .r-cta-grid {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .r-cta-grid {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 3rem;
+    }
+    .r-cta-inner {
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem);
+    }
+  }
+  .r-cta-inner .btn-row {
+    margin-top: 1.5rem;
+  }
+  .r-cta-inner p {
+    max-width: 50ch;
+  }
+</style>

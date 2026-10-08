@@ -1,0 +1,151 @@
+---
+// One slowly scrolling row of real reviews (Keystatic → Site-wide → Testimonials).
+// The section only renders when at least one review exists. Hover pauses it.
+import { getTestimonials, accent } from '../lib/cms';
+
+interface Props {
+  label?: string | null;
+  heading: string;
+  ratingText?: string | null;
+}
+const { label, heading, ratingText } = Astro.props;
+const iso = (d: unknown) => (!d ? '' : typeof d === 'string' ? d.slice(0, 10) : new Date(d as Date).toISOString().slice(0, 10));
+const reviews = (await getTestimonials()).sort((a, b) => iso(b.entry.date).localeCompare(iso(a.entry.date)));
+const fmt = (d: unknown) =>
+  iso(d) ? new Date(iso(d) + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }) : '';
+const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
+// Repeat the list so the strip can loop seamlessly
+const loop = reviews.length < 4 ? [...reviews, ...reviews, ...reviews] : reviews;
+---
+
+{
+  reviews.length > 0 && (
+    <section class="section reviews" aria-labelledby="reviews-title">
+      <div class="wrap">
+        <div class="head" data-reveal>
+          {label && <p class="label">{label}</p>}
+          <h2 id="reviews-title" set:html={accent(heading)} />
+          {ratingText && (
+            <p class="score">
+              <span class="stars" aria-hidden="true">★★★★★</span>
+              <span>{ratingText}</span>
+            </p>
+          )}
+        </div>
+      </div>
+      <div class="strip">
+        <ul class="row">
+          {[...loop, ...loop].map(({ entry }, i) => (
+            <li class="rcard" aria-hidden={i >= loop.length ? 'true' : undefined}>
+              <figure>
+                <p class="stars" aria-label={`${entry.rating ?? 5} out of 5 stars`}>
+                  {stars(entry.rating ?? 5)}
+                </p>
+                <blockquote>{entry.quote}</blockquote>
+                <figcaption>
+                  <b>{entry.name}</b>
+                  <span>
+                    {fmt(entry.date)}
+                    {entry.source && ` · ${entry.source}`}
+                  </span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .reviews {
+    overflow: hidden;
+  }
+  .score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    color: var(--muted);
+  }
+  .stars {
+    color: var(--gold);
+    letter-spacing: 3px;
+    font-size: 1.15rem;
+    margin: 0;
+  }
+  .strip {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .row {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    display: flex;
+    gap: 1.4rem;
+    width: max-content;
+    animation: reviews-scroll 80s linear infinite;
+  }
+  .strip:hover .row,
+  .strip:focus-within .row {
+    animation-play-state: paused;
+  }
+  @keyframes reviews-scroll {
+    to {
+      transform: translateX(calc(-50% - 0.7rem));
+    }
+  }
+  .rcard {
+    width: min(410px, 82vw);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 1.6rem 1.75rem;
+    transition: border-color 0.3s ease, transform 0.45s var(--ease);
+  }
+  .rcard:hover {
+    border-color: rgba(212, 162, 76, 0.55);
+    transform: translateY(-4px);
+  }
+  figure {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  blockquote {
+    margin: 0.8rem 0 1.2rem;
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  figcaption b {
+    color: var(--ivory);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .strip {
+      overflow-x: auto;
+      mask-image: none;
+    }
+    .row {
+      animation: none;
+      padding-inline: var(--gutter);
+    }
+  }
+</style>

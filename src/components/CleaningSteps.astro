@@ -1,0 +1,287 @@
+---
+// Homepage cleaning process. On computers the section stays pinned while you scroll,
+// each step lights up in turn and a 3D rug unrolls a little more for every step.
+// Phones, reduced-motion users and browsers without WebGL get a simple list and a still rug.
+import { accent } from '../lib/cms';
+
+interface Props {
+  label: string;
+  heading: string;
+  steps: readonly { title: string; text: string }[];
+  primary: { label: string; url: string };
+  secondary?: { label: string; url: string };
+}
+const { label, heading, steps, primary, secondary } = Astro.props;
+---
+
+<section class="steps-section" data-steps aria-labelledby="steps-title">
+  <div class="pin">
+    <div class="wrap steps-grid">
+      <div class="steps-text">
+        <p class="label">{label}</p>
+        <h2 id="steps-title" set:html={accent(heading)} />
+        <ol class="plist">
+          {
+            steps.map((st, i) => (
+              <li style={`--i:${i}`}>
+                <span class="n" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3>{st.title}</h3>
+                  <p>{st.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="btn-row">
+          <a class="btn" href={primary.url}>{primary.label}</a>
+          {
+            secondary && (
+              <a class="btn btn-quiet" href={secondary.url} data-astro-prefetch="hover">
+                {secondary.label}
+              </a>
+            )
+          }
+        </div>
+      </div>
+      <div class="steps-stage" data-steps-stage aria-hidden="true">
+        <picture>
+          <source
+            media="(min-width: 1024px) and (prefers-reduced-motion: no-preference)"
+            srcset="/images/hero/rug-rolled-700.webp 700w, /images/hero/rug-rolled-1400.webp 1400w"
+            sizes="50vw"
+          />
+          <img
+          class="steps-poster"
+          src="/images/hero/rug-flat-700.webp"
+          srcset="/images/hero/rug-flat-700.webp 700w, /images/hero/rug-flat-1400.webp 1400w"
+          sizes="(min-width: 1024px) 50vw, 92vw"
+          width="1400"
+          height="967"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        </picture>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import type { mountRug as MountRug } from '../scripts/rug3d';
+  type Rug = ReturnType<typeof MountRug>;
+  let rug: Rug | null = null;
+  let cleanup: (() => void) | null = null;
+
+  function hasWebGL() {
+    try {
+      const c = document.createElement('canvas');
+      const gl = (c.getContext('webgl2') || c.getContext('webgl')) as WebGLRenderingContext | null;
+      gl?.getExtension('WEBGL_lose_context')?.loseContext();
+      return !!gl;
+    } catch {
+      return false;
+    }
+  }
+
+  function init() {
+    const section = document.querySelector<HTMLElement>('[data-steps]');
+    if (!section || section.dataset.ready) return;
+    section.dataset.ready = '1';
+    const items = [...section.querySelectorAll<HTMLLIElement>('.plist li')];
+    const stage = section.querySelector<HTMLElement>('[data-steps-stage]')!;
+    const wanted =
+      window.matchMedia('(min-width: 1024px) and (prefers-reduced-motion: no-preference)').matches && hasWebGL();
+    if (!wanted) {
+      stage.querySelector('source')?.remove();
+      items.forEach((li) => li.classList.add('on'));
+      return;
+    }
+    section.classList.add('is-pinned');
+
+    let target = 0;
+    let current = 0;
+    let ticking = false;
+    const follow = () => {
+      current += (target - current) * 0.07; // glide toward the scroll position
+      if (Math.abs(target - current) < 0.0008) current = target;
+      rug?.setT(0.15 + current * 0.85);
+      ticking = current !== target;
+      if (ticking) requestAnimationFrame(follow);
+    };
+    const onScroll = () => {
+      const r = section.getBoundingClientRect();
+      const raw = -r.top / Math.max(1, r.height - window.innerHeight);
+      target = Math.min(1, Math.max(0, (raw - 0.05) / 0.85));
+      items.forEach((li, i) => li.classList.toggle('on', target >= i / items.length));
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(follow);
+      }
+    };
+
+    // Load three.js only when the section gets close
+    const io = new IntersectionObserver(
+      async ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        try {
+          const { mountRug } = await import('../scripts/rug3d');
+          if (!stage.isConnected) return;
+          rug = mountRug(stage, { manual: true, startT: 0.15, onReady: () => stage.classList.add('is-live') });
+          onScroll();
+        } catch {
+          // keep a still image and the plain list
+          stage.querySelector('source')?.remove();
+          section.classList.remove('is-pinned');
+          items.forEach((li) => li.classList.add('on'));
+        }
+      },
+      { rootMargin: '600px 0px' },
+    );
+    io.observe(section);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    cleanup = () => {
+      io.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      rug?.dispose();
+      rug = null;
+    };
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
+  document.addEventListener('astro:before-swap', () => {
+    cleanup?.();
+    cleanup = null;
+  });
+</script>
+
+<style>
+  .steps-section {
+    position: relative;
+    background: var(--bg2);
+    border-block: 1px solid var(--line);
+    padding-block: var(--section);
+  }
+  .steps-grid {
+    display: grid;
+    gap: 3rem 4rem;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .steps-grid {
+      grid-template-columns: 0.9fr 1.1fr;
+    }
+    /* Pinned scroll version (added by the script on computers) */
+    .steps-section.is-pinned {
+      height: 400vh;
+      padding: 0;
+    }
+    .is-pinned h2 {
+      font-size: clamp(2.2rem, 1.4rem + 2vw, 3.3rem);
+    }
+    .is-pinned .plist {
+      margin-block: 1rem 1.5rem;
+    }
+    .is-pinned .plist li {
+      padding-block: 0.3rem;
+    }
+    .is-pinned .pin {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: var(--header-h);
+    }
+  }
+  .plist {
+    list-style: none;
+    margin: 1.4rem 0 2rem;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .plist li {
+    display: grid;
+    grid-template-columns: 3.25rem 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding: 0.45rem 0;
+    opacity: 0.35;
+    transition: opacity 0.5s ease, transform 0.6s var(--ease);
+  }
+  .plist li.on {
+    opacity: 1;
+    transform: translateX(8px);
+  }
+  .n {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    display: grid;
+    place-items: center;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--gold);
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  li.on .n {
+    background: var(--gold);
+    color: var(--bg);
+  }
+  .plist h3 {
+    font-size: 1.55rem;
+    margin: 0;
+  }
+  .plist p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.97rem;
+  }
+  .steps-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1400 / 967;
+  }
+  .steps-stage::after {
+    content: '';
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: 8%;
+    height: 18%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgba(212, 162, 76, 0.16), transparent);
+  }
+  .steps-stage picture {
+    display: block;
+    height: 100%;
+  }
+  .steps-poster {
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s ease 0.15s;
+  }
+  .steps-stage :global(.rug-canvas) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .steps-stage.is-live :global(.rug-canvas) {
+    opacity: 1;
+  }
+  .steps-stage.is-live .steps-poster {
+    opacity: 0;
+  }
+</style>

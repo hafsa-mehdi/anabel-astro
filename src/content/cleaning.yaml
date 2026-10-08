@@ -1,0 +1,52 @@
+seo:
+  title: Oriental Rug Cleaning in Louisville, Hand-Washed | Anabel's
+  description: >-
+    Hand-washed oriental and area rug cleaning in Louisville. No steam or harsh
+    chemicals, colors tested first, white glove delivery. Book online for 15% off.
+heroImage: /images/uploads/cleaning/heroImage.webp
+heroAlt: A technician hand-washing a red oriental rug on the wash floor
+kicker: Hand-washed in Louisville
+heading: Louisville's premier *oriental rug* cleaner
+lead: >-
+  We wash every rug by hand, handle all the heavy lifting and bring it back
+  clean and in place.
+highlights:
+  - White glove delivery & installation
+  - 100% hand washed
+  - No steam or harsh chemicals
+  - Expert rug repair
+form:
+  heading: Book now and get 15% off
+  intro: >-
+    Tell us how many rugs you have and how to reach you, and we will be in touch
+    to arrange the cleaning.
+process:
+  heading: How we clean *your rugs*
+  blocks:
+    - heading: By hand, never with steam
+      body: >-
+        Every rug is washed by hand. We never use steam cleaning or harsh
+        chemicals that can damage natural wool fibers. Instead we use a mild
+        shampoo made to be safe on wool, which preserves the lanolin: the
+        natural oil coating that makes wool so durable.
+    - heading: Colors tested first
+      body: >-
+        Before any cleaning, we test each rug for color fastness, so no dyes
+        bleed or fade during the wash.
+    - heading: We do the heavy lifting
+      body: >-
+        From white glove pickup to delivery and installation, we handle every
+        step. You won’t lift a finger.
+  image: /images/uploads/cleaning/process/image.webp
+  imageAlt: Sitting room with a grand piano and armchair on an ivory and charcoal patterned rug
+  imagePosition: right
+petNote:
+  heading: An honest word about pet stains
+  body: >-
+    We treat every pet-stained area thoroughly to minimize the damage, but we
+    cannot guarantee that a pet stain will come out completely.
+interval:
+  heading: Clean it every two years
+  body: >-
+    With general wear, we recommend cleaning your rug every two years to remove
+    packed-in dust and dirt. It extends both the life and the beauty of the rug.

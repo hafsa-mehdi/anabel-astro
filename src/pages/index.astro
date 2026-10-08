@@ -1,0 +1,463 @@
+---
+import Base from '../layouts/Base.astro';
+import RugHero from '../components/RugHero.astro';
+import Img from '../components/Img.astro';
+import SmartLink from '../components/SmartLink.astro';
+import Icon from '../components/Icon.astro';
+import CleaningSteps from '../components/CleaningSteps.astro';
+import Reviews from '../components/Reviews.astro';
+import ShowroomMap from '../components/ShowroomMap.astro';
+import { getSettings, mustRead, absoluteImage, accent, reader } from '../lib/cms';
+import { localBusiness } from '../lib/schema';
+
+const s = await getSettings();
+const home = await mustRead('home');
+const visitPage = await reader.singletons.visit.read();
+const site = Astro.site!;
+const { hero, marquee, services, cleaning, repairs, reviews, visit } = home;
+---
+
+<Base
+  title={home.seo.title}
+  description={home.seo.description}
+  image={services.cards[0]?.image}
+  imageAlt={services.cards[0]?.imageAlt}
+  heroUnderHeader
+  jsonLd={[localBusiness(s, absoluteImage(visitPage?.image, site))]}
+>
+  <!-- 1. Hero: headline, offer, and the 3D rug that unrolls under the buttons -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="mesh" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="wrap hero-inner">
+      {hero.kicker && <p class="label label-ruled hero-kicker">{hero.kicker}</p>}
+      <h1 id="hero-title" class="hero-title" set:html={accent(hero.heading)} />
+      <p class="hero-sub">{hero.subtitle}</p>
+      <div class="btn-row hero-ctas">
+        <a class="btn" href={hero.primary.url}>{hero.primary.label}</a>
+        <SmartLink class="btn btn-quiet" href={hero.secondary.url} showIcon={false}>{hero.secondary.label}</SmartLink>
+      </div>
+      <div class="hero-rug">
+        <RugHero />
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Moving text strip -->
+  {
+    marquee.length > 0 && (
+      <div class="marquee">
+        <p class="sr-only">{marquee.join('. ')}</p>
+        <div class="track" aria-hidden="true">
+          {[0, 1].map(() =>
+            marquee.map((m) => (
+              <>
+                <span>{m}</span>
+                <i>✦</i>
+              </>
+            )),
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  <!-- 3. Three services (the "Try Before You Buy" menu link lands here) -->
+  <section class="section services" id="try-before-you-buy" aria-labelledby="services-title">
+    <div class="wrap">
+      <div class="head" data-reveal>
+        {services.label && <p class="label">{services.label}</p>}
+        <h2 id="services-title" set:html={accent(services.heading)} />
+        {services.intro && <p>{services.intro}</p>}
+      </div>
+      <div class="cards">
+        {
+          services.cards.map((c, i) => (
+            <article class="card" data-reveal style={`--i:${i}`}>
+              <div class="card-media">
+                <Img src={c.image} alt={c.imageAlt} sizes="(min-width: 1000px) 32vw, (min-width: 700px) 50vw, 100vw" />
+              </div>
+              <div class="card-body">
+                <span class="card-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3>
+                  {c.title}
+                  {c.tag && <span class="tag">{c.tag}</span>}
+                </h3>
+                <p>{c.text}</p>
+                <SmartLink class="card-link" href={c.link.url}>
+                  {c.link.url.startsWith('tel:') && <Icon name="phone" />}
+                  {c.link.label}
+                </SmartLink>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Cleaning process with the scroll-driven 3D rug -->
+  <CleaningSteps
+    label={cleaning.label}
+    heading={cleaning.heading}
+    steps={cleaning.steps}
+    primary={cleaning.primary}
+    secondary={cleaning.secondary}
+  />
+
+  <!-- 5. Repairs -->
+  <section class="section repairs" aria-labelledby="repairs-title">
+    <div class="wrap">
+      <div class="head" data-reveal>
+        {repairs.label && <p class="label">{repairs.label}</p>}
+        <h2 id="repairs-title" set:html={accent(repairs.heading)} />
+        {repairs.intro && <p>{repairs.intro}</p>}
+      </div>
+      <ul class="repair-grid">
+        {
+          repairs.items.map((r, i) => (
+            <li data-reveal style={`--i:${i % 3}`}>
+              <SmartLink href={r.url}>
+                <span class="r-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span class="r-label">{r.label}</span>
+              </SmartLink>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6. Reviews (only when testimonials exist) -->
+  <Reviews label={reviews.label} heading={reviews.heading} ratingText={reviews.ratingText} />
+
+  <!-- 7. Animated map + visit details -->
+  <section class="section visit">
+    <div class="wrap">
+      <ShowroomMap label={visit.label} heading={visit.heading} intro={visit.intro} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Hero ----------------------------------------------------------------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: calc(var(--header-h) + clamp(2rem, 5vw, 3.5rem)) 0 clamp(1rem, 3vw, 2rem);
+    text-align: center;
+    isolation: isolate;
+  }
+  .mesh {
+    position: absolute;
+    inset: -20%;
+    z-index: -1;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  /* Soft colour pools: radial gradients instead of a blur filter, so they are cheap to paint */
+  .mesh span {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  .mesh span:nth-child(1) {
+    width: 44vw;
+    height: 44vw;
+    left: 18%;
+    top: 26%;
+    background: radial-gradient(closest-side, var(--madder), transparent);
+  }
+  .mesh span:nth-child(2) {
+    width: 36vw;
+    height: 36vw;
+    right: 16%;
+    top: 18%;
+    background: radial-gradient(closest-side, var(--indigo), transparent);
+  }
+  .mesh span:nth-child(3) {
+    width: 26vw;
+    height: 26vw;
+    left: 42%;
+    top: 50%;
+    background: radial-gradient(closest-side, #8a6420, transparent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mesh span {
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    .mesh span:nth-child(2) {
+      animation-delay: -6s;
+    }
+    .mesh span:nth-child(3) {
+      animation-delay: -11s;
+    }
+  }
+  @keyframes drift {
+    to {
+      transform: translate(6vw, -4vw) scale(1.12);
+    }
+  }
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-title {
+    max-width: 16ch;
+    margin: 0.35em auto 0.4em;
+  }
+  .hero-sub {
+    max-width: 50ch;
+    margin: 0 auto 1.8rem;
+    color: var(--muted);
+    font-size: clamp(1.05rem, 1rem + 0.3vw, 1.18rem);
+  }
+  .hero-ctas {
+    justify-content: center;
+  }
+  .hero-rug {
+    width: min(900px, 100%);
+    margin-top: clamp(0.5rem, 2vw, 0rem);
+  }
+  @media (max-width: 767.98px) {
+    .hero-rug {
+      margin-top: 1.5rem;
+    }
+  }
+  /* Entrance: lines rise, then the rest fades in (CSS only) */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-kicker,
+    .hero-title,
+    .hero-sub,
+    .hero-ctas,
+    .hero-rug {
+      animation: rise-in 1.1s var(--ease) both;
+    }
+    .hero-title {
+      animation-delay: 0.08s;
+    }
+    .hero-sub {
+      animation-delay: 0.25s;
+    }
+    .hero-ctas {
+      animation-delay: 0.38s;
+    }
+    .hero-rug {
+      animation: fade-in 1.2s ease 0.5s both;
+    }
+  }
+  @keyframes rise-in {
+    from {
+      transform: translateY(28px);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      transform: translateY(18px);
+    }
+  }
+
+  /* Marquee --------------------------------------------------------------- */
+  .marquee {
+    overflow: hidden;
+    padding: 1.4rem 0;
+    background: var(--bg2);
+    border-block: 1px solid var(--line);
+  }
+  .track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .track {
+      animation: marquee 34s linear infinite;
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .track span {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.7rem, 1.2rem + 1.5vw, 2.5rem);
+    padding: 0 1.75rem;
+    white-space: nowrap;
+  }
+  .track i {
+    font-style: normal;
+    color: var(--gold);
+    font-size: 1.2rem;
+  }
+
+  /* Service cards (three equal columns) ----------------------------------- */
+  .cards {
+    display: grid;
+    gap: 1.6rem;
+  }
+  @media (min-width: 700px) {
+    .cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1000px) {
+    .cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.5s var(--ease), border-color 0.4s ease;
+  }
+  .card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(212, 162, 76, 0.5);
+  }
+  .card-media {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+  .card-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease);
+  }
+  .card:hover .card-media :global(img) {
+    transform: scale(1.07);
+  }
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.7rem 1.75rem 1.9rem;
+  }
+  .card-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--gold);
+  }
+  .card h3 {
+    font-size: 1.95rem;
+    margin: 0.3rem 0 0.6rem;
+  }
+  .card p {
+    color: var(--muted);
+    font-size: 0.98rem;
+    flex: 1;
+  }
+  .tag {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.25em 0.8em;
+    border-radius: 999px;
+    background: var(--madder);
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 800;
+    vertical-align: 0.35em;
+  }
+  .card :global(.card-link) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1rem;
+    font-weight: 800;
+    font-size: 0.94rem;
+    text-decoration: none;
+  }
+  .card :global(.card-link svg) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--gold);
+  }
+  /* The whole card is clickable; the link stays the single real link */
+  .card :global(.card-link)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .card:focus-within {
+    outline: 2px solid var(--gold);
+    outline-offset: 4px;
+  }
+
+  /* Repairs: six links in a symmetric grid -------------------------------- */
+  .repair-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 640px) {
+    .repair-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1000px) {
+    .repair-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .repair-grid li {
+    border-bottom: 1px solid var(--line);
+  }
+  .repair-grid :global(a) {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.5rem 1rem;
+    text-decoration: none;
+    overflow: hidden;
+  }
+  .repair-grid :global(a)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--ease);
+  }
+  .repair-grid :global(a:hover)::before {
+    transform: scaleX(1);
+  }
+  .r-num {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1.1rem;
+  }
+  .r-label {
+    font-family: var(--serif);
+    font-size: 1.65rem;
+    font-weight: 500;
+    transition: transform 0.4s var(--ease);
+  }
+  .repair-grid :global(a:hover) .r-label {
+    transform: translateX(6px);
+  }
+
+  .visit {
+    padding-top: 0;
+  }
+</style>

@@ -1,0 +1,107 @@
+seo:
+  title: Oriental Rugs, Cleaning & Repair in Louisville | Anabel's
+  description: >-
+    Handmade rugs hand-picked by Anabel, hand-washed rug cleaning (15% off when
+    you book online) and expert repair, at 3740 Frankfort Ave, Louisville.
+hero:
+  kicker: Frankfort Avenue · Louisville
+  heading: The *perfect* rug at the *perfect* price.
+  subtitle: >-
+    Handmade rugs hand-picked by Anabel, gentle hand-washed cleaning and expert
+    repair, all under one roof.
+  primary:
+    label: 'Book cleaning: 15% off'
+    url: /contact/#book
+  secondary:
+    label: Browse rugs
+    url: https://shop.anabelsorientalrugs.com/
+marquee:
+  - Hand-washed, never steamed
+  - Try before you buy
+  - White glove delivery
+  - Expert repair
+services:
+  label: What we do
+  heading: Three ways we care for *your rugs*
+  intro: >-
+    Anabel hand-picks every rug in the showroom, handmade by skilled artisans in
+    countries like India, Turkey, Pakistan, Afghanistan and Nepal. Then we keep
+    yours clean, and mend it when life happens.
+  cards:
+    - title: Try before you buy
+      text: >-
+        Take a rug home with no obligation. Sometimes seeing it in your own room
+        is the only way to know. White glove delivery and installation included.
+      tag: ''
+      image: /images/uploads/home/services/cards/0/image.webp
+      imageAlt: >-
+        Living room with white sofas, green armchairs and a large blue and white
+        patterned rug in front of the fireplace
+      link:
+        label: Call to schedule a home trial
+        url: tel:+15028959595
+    - title: Rug cleaning
+      text: >-
+        Hand-washed with a wool-safe shampoo. No steam, no harsh chemicals, and
+        colors tested before we start.
+      tag: 15% off
+      image: /images/uploads/home/services/cards/1/image.webp
+      imageAlt: A technician hand-washing a red oriental rug on the wash floor
+      link:
+        label: Book cleaning
+        url: /louisville-rug-cleaning/
+    - title: Expert repair
+      text: >-
+        Holes and tears, fringe, edges, faded color and water damage, mended by
+        hand with matching threads.
+      tag: ''
+      image: /images/uploads/home/services/cards/2/image.webp
+      imageAlt: Hands re-weaving the border of a navy and red oriental rug, with spools of thread beside it
+      link:
+        label: See repairs
+        url: /hole-or-tear-repair/
+cleaning:
+  label: Our cleaning process
+  heading: Five careful steps, *start to finish*
+  steps:
+    - title: Pickup
+      text: White glove collection. You won’t lift a finger.
+    - title: Inspection
+      text: Every dye is tested for color fastness first.
+    - title: Hand wash
+      text: Wool-safe shampoo that protects the lanolin.
+    - title: Drying
+      text: Fully dried before it leaves us.
+    - title: Delivery
+      text: Brought home and laid back in place.
+  primary:
+    label: 'Book cleaning: 15% off'
+    url: /contact/#book
+  secondary:
+    label: How our rug cleaning works
+    url: /louisville-rug-cleaning/
+repairs:
+  label: Repairs
+  heading: Mended by hand, *made to last*
+  intro: Choose a repair to learn more, or call us and describe the damage.
+  items:
+    - label: Hole or Tear Repair
+      url: /hole-or-tear-repair/
+    - label: Fringe Repair
+      url: /fringe-repair/
+    - label: Color Restoration
+      url: /color-restoration/
+    - label: Edge Binding
+      url: /edge-binding/
+    - label: Water Damage Restoration
+      url: /water-damage-restoration/
+    - label: Rug Reweaving
+      url: /rug-reweaving/
+reviews:
+  label: What our customers say
+  heading: Loved across *Louisville*
+  ratingText: Rated Excellent · 134 Google reviews
+visit:
+  label: Visit the showroom
+  heading: See the rugs *in person*
+  intro: Drop by to browse, bring in a rug for cleaning or ask about a repair.

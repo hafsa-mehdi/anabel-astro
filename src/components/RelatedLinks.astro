@@ -1,0 +1,74 @@
+---
+// "Also from Anabel's": links the Cleaning, Repair and Blog pages to each other.
+interface Props {
+  heading?: string;
+  links: { label: string; url: string; text: string }[];
+}
+const { heading = 'Related', links } = Astro.props;
+---
+
+<aside class="section related" aria-labelledby="related-title">
+  <div class="wrap">
+    <h2 id="related-title" class="r-title">{heading}</h2>
+    <ul>
+      {
+        links.map((l, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            <a href={l.url} data-astro-prefetch="hover">
+              <span class="r-label">{l.label}</span>
+              <span class="r-text">{l.text}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</aside>
+
+<style>
+  .r-title {
+    font-size: clamp(1.9rem, 1.5rem + 1.2vw, 2.6rem);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 760px) {
+    ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  a {
+    display: grid;
+    gap: 0.45rem;
+    height: 100%;
+    padding: 1.75rem 1.9rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: border-color 0.35s ease, transform 0.45s var(--ease);
+  }
+  a:hover {
+    border-color: rgba(212, 162, 76, 0.5);
+    transform: translateY(-4px);
+    color: var(--ivory);
+  }
+  .r-label {
+    font-family: var(--serif);
+    font-size: 1.65rem;
+    line-height: 1.15;
+  }
+  a:hover .r-label {
+    color: var(--gold);
+  }
+  .r-text {
+    color: var(--muted);
+    font-size: 0.97rem;
+  }
+</style>

@@ -1,0 +1,582 @@
+{
+  "/images/uploads/areas/indiana-rug-cleaning-services/heroImage.webp": {
+    "width": 1620,
+    "height": 1080,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/areas/indiana-rug-cleaning-services/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/areas/indiana-rug-cleaning-services/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/areas/indiana-rug-cleaning-services/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/areas/indiana-rug-cleaning-services/heroImage-1200.webp"
+      },
+      {
+        "w": 1620,
+        "src": "/images/_r/areas/indiana-rug-cleaning-services/heroImage-1620.webp"
+      }
+    ]
+  },
+  "/images/uploads/areas/kentucky-rug-cleaning-services/heroImage.webp": {
+    "width": 640,
+    "height": 425,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/areas/kentucky-rug-cleaning-services/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/areas/kentucky-rug-cleaning-services/heroImage-640.webp"
+      }
+    ]
+  },
+  "/images/uploads/cleaning/heroImage.webp": {
+    "width": 1697,
+    "height": 969,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/cleaning/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/cleaning/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/cleaning/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/cleaning/heroImage-1200.webp"
+      },
+      {
+        "w": 1697,
+        "src": "/images/_r/cleaning/heroImage-1697.webp"
+      }
+    ]
+  },
+  "/images/uploads/cleaning/process/image.webp": {
+    "width": 1080,
+    "height": 1620,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/cleaning/process/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/cleaning/process/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/cleaning/process/image-800.webp"
+      },
+      {
+        "w": 1080,
+        "src": "/images/_r/cleaning/process/image-1080.webp"
+      }
+    ]
+  },
+  "/images/uploads/designers/benefitsImage.webp": {
+    "width": 450,
+    "height": 600,
+    "variants": []
+  },
+  "/images/uploads/designers/image.webp": {
+    "width": 1500,
+    "height": 999,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/designers/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/designers/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/designers/image-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/designers/image-1200.webp"
+      },
+      {
+        "w": 1500,
+        "src": "/images/_r/designers/image-1500.webp"
+      }
+    ]
+  },
+  "/images/uploads/home/services/cards/0/image.webp": {
+    "width": 1770,
+    "height": 1032,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/home/services/cards/0/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/home/services/cards/0/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/home/services/cards/0/image-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/home/services/cards/0/image-1200.webp"
+      },
+      {
+        "w": 1770,
+        "src": "/images/_r/home/services/cards/0/image-1770.webp"
+      }
+    ]
+  },
+  "/images/uploads/home/services/cards/1/image.webp": {
+    "width": 1697,
+    "height": 969,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/home/services/cards/1/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/home/services/cards/1/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/home/services/cards/1/image-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/home/services/cards/1/image-1200.webp"
+      },
+      {
+        "w": 1697,
+        "src": "/images/_r/home/services/cards/1/image-1697.webp"
+      }
+    ]
+  },
+  "/images/uploads/home/services/cards/2/image.webp": {
+    "width": 2000,
+    "height": 1148,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/home/services/cards/2/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/home/services/cards/2/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/home/services/cards/2/image-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/home/services/cards/2/image-1200.webp"
+      },
+      {
+        "w": 1800,
+        "src": "/images/_r/home/services/cards/2/image-1800.webp"
+      }
+    ]
+  },
+  "/images/uploads/repairs/color-restoration/heroImage.webp": {
+    "width": 1200,
+    "height": 800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/repairs/color-restoration/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/repairs/color-restoration/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/repairs/color-restoration/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/repairs/color-restoration/heroImage-1200.webp"
+      }
+    ]
+  },
+  "/images/uploads/repairs/edge-binding/heroImage.webp": {
+    "width": 1200,
+    "height": 800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/repairs/edge-binding/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/repairs/edge-binding/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/repairs/edge-binding/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/repairs/edge-binding/heroImage-1200.webp"
+      }
+    ]
+  },
+  "/images/uploads/repairs/fringe-repair/heroImage.webp": {
+    "width": 1800,
+    "height": 1200,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/repairs/fringe-repair/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/repairs/fringe-repair/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/repairs/fringe-repair/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/repairs/fringe-repair/heroImage-1200.webp"
+      },
+      {
+        "w": 1800,
+        "src": "/images/_r/repairs/fringe-repair/heroImage-1800.webp"
+      }
+    ]
+  },
+  "/images/uploads/repairs/hole-or-tear-repair/heroImage.webp": {
+    "width": 2000,
+    "height": 1148,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/repairs/hole-or-tear-repair/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/repairs/hole-or-tear-repair/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/repairs/hole-or-tear-repair/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/repairs/hole-or-tear-repair/heroImage-1200.webp"
+      },
+      {
+        "w": 1800,
+        "src": "/images/_r/repairs/hole-or-tear-repair/heroImage-1800.webp"
+      }
+    ]
+  },
+  "/images/uploads/repairs/rug-reweaving/heroImage.webp": {
+    "width": 1800,
+    "height": 1200,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/repairs/rug-reweaving/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/repairs/rug-reweaving/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/repairs/rug-reweaving/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/repairs/rug-reweaving/heroImage-1200.webp"
+      },
+      {
+        "w": 1800,
+        "src": "/images/_r/repairs/rug-reweaving/heroImage-1800.webp"
+      }
+    ]
+  },
+  "/images/uploads/repairs/water-damage-restoration/heroImage.webp": {
+    "width": 1200,
+    "height": 800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/repairs/water-damage-restoration/heroImage-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/repairs/water-damage-restoration/heroImage-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/repairs/water-damage-restoration/heroImage-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/repairs/water-damage-restoration/heroImage-1200.webp"
+      }
+    ]
+  },
+  "/images/uploads/site/logo.png": {
+    "width": 225,
+    "height": 85,
+    "variants": []
+  },
+  "/images/uploads/team/members/0/photo.webp": {
+    "width": 1350,
+    "height": 1800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/team/members/0/photo-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/team/members/0/photo-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/team/members/0/photo-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/team/members/0/photo-1200.webp"
+      },
+      {
+        "w": 1350,
+        "src": "/images/_r/team/members/0/photo-1350.webp"
+      }
+    ]
+  },
+  "/images/uploads/team/members/1/photo.webp": {
+    "width": 1350,
+    "height": 1800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/team/members/1/photo-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/team/members/1/photo-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/team/members/1/photo-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/team/members/1/photo-1200.webp"
+      },
+      {
+        "w": 1350,
+        "src": "/images/_r/team/members/1/photo-1350.webp"
+      }
+    ]
+  },
+  "/images/uploads/team/members/2/photo.webp": {
+    "width": 1350,
+    "height": 1800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/team/members/2/photo-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/team/members/2/photo-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/team/members/2/photo-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/team/members/2/photo-1200.webp"
+      },
+      {
+        "w": 1350,
+        "src": "/images/_r/team/members/2/photo-1350.webp"
+      }
+    ]
+  },
+  "/images/uploads/team/members/3/photo.webp": {
+    "width": 1350,
+    "height": 1800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/team/members/3/photo-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/team/members/3/photo-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/team/members/3/photo-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/team/members/3/photo-1200.webp"
+      },
+      {
+        "w": 1350,
+        "src": "/images/_r/team/members/3/photo-1350.webp"
+      }
+    ]
+  },
+  "/images/uploads/team/members/4/photo.webp": {
+    "width": 1350,
+    "height": 1800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/team/members/4/photo-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/team/members/4/photo-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/team/members/4/photo-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/team/members/4/photo-1200.webp"
+      },
+      {
+        "w": 1350,
+        "src": "/images/_r/team/members/4/photo-1350.webp"
+      }
+    ]
+  },
+  "/images/uploads/team/members/5/photo.webp": {
+    "width": 1350,
+    "height": 1800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/team/members/5/photo-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/team/members/5/photo-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/team/members/5/photo-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/team/members/5/photo-1200.webp"
+      },
+      {
+        "w": 1350,
+        "src": "/images/_r/team/members/5/photo-1350.webp"
+      }
+    ]
+  },
+  "/images/uploads/team/story/image.webp": {
+    "width": 1350,
+    "height": 1800,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/team/story/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/team/story/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/team/story/image-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/team/story/image-1200.webp"
+      },
+      {
+        "w": 1350,
+        "src": "/images/_r/team/story/image-1350.webp"
+      }
+    ]
+  },
+  "/images/uploads/tour/image.webp": {
+    "width": 1500,
+    "height": 999,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/tour/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/tour/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/tour/image-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/tour/image-1200.webp"
+      },
+      {
+        "w": 1500,
+        "src": "/images/_r/tour/image-1500.webp"
+      }
+    ]
+  },
+  "/images/uploads/visit/image.webp": {
+    "width": 1391,
+    "height": 1854,
+    "variants": [
+      {
+        "w": 480,
+        "src": "/images/_r/visit/image-480.webp"
+      },
+      {
+        "w": 640,
+        "src": "/images/_r/visit/image-640.webp"
+      },
+      {
+        "w": 800,
+        "src": "/images/_r/visit/image-800.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/_r/visit/image-1200.webp"
+      },
+      {
+        "w": 1391,
+        "src": "/images/_r/visit/image-1391.webp"
+      }
+    ]
+  }
+}

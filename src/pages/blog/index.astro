@@ -1,0 +1,127 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { mustRead, accent } from '../../lib/cms';
+
+const page = await mustRead('blog');
+const posts = (await getCollection('posts')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+---
+
+<Base title={page.seo.title} description={page.seo.description} crumbs={[{ name: 'Blog', url: '/blog/' }]}>
+  <header class="wrap b-head">
+    <h1 set:html={accent(page.heading)} />
+    {page.intro && <p class="lead">{page.intro}</p>}
+  </header>
+
+  <section class="wrap b-list" aria-label="Posts">
+    {
+      posts.map((post, i) => (
+        <article class:list={['b-card', { 'b-card--lead': i === 0 }]} data-reveal={i > 0 ? '' : undefined}>
+          {post.data.heroImage && (
+            <Image
+              src={post.data.heroImage}
+              alt={post.data.heroAlt}
+              widths={[480, 800, 1200]}
+              sizes={i === 0 ? '(min-width: 1024px) 55vw, 100vw' : '(min-width: 760px) 33vw, 100vw'}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              format="webp"
+              quality={70}
+            />
+          )}
+          <div class="b-text">
+            <p class="label b-date">
+              <time datetime={post.data.pubDate.toISOString().slice(0, 10)}>{fmt(post.data.pubDate)}</time>
+            </p>
+            <h2>
+              <a href={`/${post.id}/`} data-astro-prefetch="hover">
+                {post.data.title}
+              </a>
+            </h2>
+            <p>{post.data.description}</p>
+          </div>
+        </article>
+      ))
+    }
+  </section>
+</Base>
+
+<style>
+  .b-head {
+    padding-block: 2rem 3rem;
+    text-align: center;
+  }
+  .b-head .lead {
+    max-width: 50ch;
+    margin-inline: auto;
+  }
+  .b-list {
+    display: grid;
+    gap: 2rem;
+    padding-bottom: var(--section);
+  }
+  @media (min-width: 760px) {
+    .b-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .b-card--lead {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      align-items: center;
+    }
+  }
+  .b-card {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.35s ease, transform 0.5s var(--ease);
+  }
+  .b-card:hover {
+    border-color: rgba(212, 162, 76, 0.5);
+    transform: translateY(-6px);
+  }
+  .b-card img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease);
+  }
+  .b-card:hover img {
+    transform: scale(1.05);
+  }
+  .b-text {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .b-date {
+    margin-bottom: 0.7rem;
+  }
+  .b-card h2 {
+    font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.6rem);
+  }
+  .b-card h2 a {
+    text-decoration: none;
+  }
+  .b-card h2 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .b-card:hover h2 a {
+    color: var(--gold);
+  }
+  .b-card:focus-within {
+    outline: 2px solid var(--gold);
+    outline-offset: 4px;
+  }
+  .b-card h2 a:focus-visible {
+    outline: none;
+  }
+  .b-card p:last-child {
+    color: var(--muted);
+  }
+</style>

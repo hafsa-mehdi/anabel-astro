@@ -1,0 +1,214 @@
+---
+// Designer account application. Sent as multipart form data (so the document upload
+// comes along) to the "Booking form destination" in Site settings, with formType=designer-application.
+import { getSettings, telHref, accent } from '../lib/cms';
+
+interface Props {
+  heading: string;
+  intro?: string | null;
+  documentsHelp?: string | null;
+}
+const { heading, intro, documentsHelp } = Astro.props;
+const s = await getSettings();
+const endpoint = (s.formEndpoint ?? '').trim();
+---
+
+<section class="apply" id="apply" aria-labelledby="apply-title">
+  <h2 id="apply-title" set:html={accent(heading)} />
+  {intro && <p class="apply-intro">{intro}</p>}
+
+  <form
+    data-designer-form
+    data-endpoint={endpoint}
+    data-phone={s.phone}
+    data-email={s.email}
+    method="post"
+    enctype="multipart/form-data"
+    action={endpoint || undefined}
+    novalidate
+  >
+    <input type="hidden" name="formType" value="designer-application" />
+    <div class="hp" aria-hidden="true">
+      <label for="d-website">Leave this field empty</label>
+      <input id="d-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label for="d-first">First name</label>
+        <input id="d-first" name="firstName" autocomplete="given-name" required />
+      </div>
+      <div class="field">
+        <label for="d-last">Last name</label>
+        <input id="d-last" name="lastName" autocomplete="family-name" required />
+      </div>
+    </div>
+    <div class="field">
+      <label for="d-company">Company</label>
+      <input id="d-company" name="company" autocomplete="organization" required />
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label for="d-email">Email</label>
+        <input id="d-email" name="email" type="email" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label for="d-phone">Phone</label>
+        <input id="d-phone" name="phone" type="tel" autocomplete="tel" required />
+      </div>
+    </div>
+    <div class="field">
+      <label for="d-desc">Description of business</label>
+      <textarea id="d-desc" name="description" rows="3" required></textarea>
+    </div>
+    <div class="field">
+      <label for="d-doc">Supporting document</label>
+      {documentsHelp && <p class="hint" id="d-doc-help">{documentsHelp}</p>}
+      <input
+        id="d-doc"
+        name="document"
+        type="file"
+        accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.doc,.docx"
+        aria-describedby={documentsHelp ? 'd-doc-help' : undefined}
+        required
+      />
+    </div>
+    <button class="btn submit" type="submit">Submit application</button>
+    <p class="status" role="status" aria-live="polite"></p>
+    <p class="alt">Questions? Call <a href={telHref(s.phone)}>{s.phone}</a>.</p>
+  </form>
+</section>
+
+<script>
+  function initDesignerForm() {
+    const form = document.querySelector<HTMLFormElement>('form[data-designer-form]');
+    if (!form || form.dataset.ready) return;
+    form.dataset.ready = '1';
+    const status = form.querySelector<HTMLElement>('.status')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const say = (msg: string, kind: string) => {
+      status.textContent = msg;
+      status.dataset.kind = kind;
+    };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const data = new FormData(form);
+      if (data.get('website')) return; // spam trap
+      data.delete('website');
+      data.append('page', location.pathname);
+      const endpoint = form.dataset.endpoint;
+      if (!endpoint) {
+        say(
+          `This form is not connected yet, so your application was not sent. Please email ${form.dataset.email} or call ${form.dataset.phone}.`,
+          'error',
+        );
+        return;
+      }
+      button.disabled = true;
+      say('Sending…', 'info');
+      try {
+        const res = await fetch(endpoint, { method: 'POST', body: data });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        say('Thank you! Your application was sent. You will receive a confirmation email upon approval.', 'ok');
+      } catch {
+        say(`Sorry, something went wrong. Please email ${form.dataset.email} or call ${form.dataset.phone}.`, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+  initDesignerForm();
+  document.addEventListener('astro:page-load', initDesignerForm);
+</script>
+
+<style>
+  .apply {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(1.4rem, 4vw, 2.4rem);
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+    overflow: hidden;
+  }
+  .apply::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, var(--madder), var(--gold));
+  }
+  .apply h2 {
+    font-size: clamp(1.9rem, 1.4rem + 1.4vw, 2.6rem);
+  }
+  .apply-intro {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .grid-2 {
+    display: grid;
+    gap: 0 1rem;
+  }
+  @media (min-width: 560px) {
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .hint {
+    margin: 0 0 0.3rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  input[type='file'] {
+    padding: 0.6rem;
+    cursor: pointer;
+  }
+  input[type='file']::file-selector-button {
+    margin-right: 0.8rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ivory);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .submit {
+    width: 100%;
+    margin-top: 0.4rem;
+  }
+  .status:empty {
+    display: none;
+  }
+  .status {
+    margin: 1rem 0 0;
+    padding: 0.8rem 1rem;
+    font-weight: 650;
+    background: rgba(243, 237, 226, 0.05);
+    border-left: 3px solid var(--gold);
+    border-radius: 6px;
+  }
+  .status[data-kind='error'] {
+    border-left-color: #d0614f;
+  }
+  .status[data-kind='ok'] {
+    border-left-color: #6fae7c;
+  }
+  .alt {
+    margin-top: 1rem;
+    font-size: 0.94rem;
+    color: var(--muted);
+  }
+</style>

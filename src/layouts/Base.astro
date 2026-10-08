@@ -1,0 +1,172 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { getSettings, absoluteImage } from '../lib/cms';
+import { breadcrumbs as crumbSchema } from '../lib/schema';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** A Keystatic upload path (/images/uploads/...) or an absolute URL */
+  image?: string | null;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  jsonLd?: object[];
+  /** Inner pages: [{ name, url }]. Home is added automatically. */
+  crumbs?: { name: string; url: string }[];
+  noindex?: boolean;
+  /** Extra <link rel="preload"> for the page's LCP image */
+  preloadImage?: { href: string; srcset?: string; sizes?: string };
+  /** Home page: the hero sits under the transparent header */
+  heroUnderHeader?: boolean;
+}
+
+const {
+  title,
+  description,
+  image,
+  imageAlt,
+  type = 'website',
+  jsonLd = [],
+  crumbs,
+  noindex: pageNoindex = false,
+  preloadImage,
+  heroUnderHeader = false,
+} = Astro.props;
+// Test deployments (e.g. a Vercel preview) must not compete with the live site in Google.
+// Set SITE_INDEXING=true only when this build replaces the live site.
+const siteNoindex = !!process.env.VERCEL && process.env.SITE_INDEXING !== 'true';
+const noindex = pageNoindex || siteNoindex;
+const s = await getSettings();
+const site = Astro.site ?? new URL('https://anabelsorientalrugs.com');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage =
+  (image?.startsWith('http') ? image : absoluteImage(image, site)) ??
+  absoluteImage('/images/uploads/home/services/cards/0/image.webp', site);
+const trail = crumbs ? [{ name: 'Home', url: '/' }, ...crumbs] : null;
+const schemas = [...jsonLd, ...(trail ? [crumbSchema(trail)] : [])];
+---
+
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {!pageNoindex && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content={siteNoindex ? 'noindex, nofollow' : 'noindex, follow'} />}
+    <meta name="theme-color" content="#16120F" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preload" href="/fonts/cormorant-500-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin />
+    {
+      preloadImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={preloadImage.href}
+          imagesrcset={preloadImage.srcset}
+          imagesizes={preloadImage.sizes}
+          fetchpriority="high"
+        />
+      )
+    }
+
+    <meta property="og:site_name" content={s.businessName} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_US" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    {schemas.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+
+    <ClientRouter fallback="swap" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <Header />
+    <main id="main" tabindex="-1" transition:animate="fade" class:list={[{ 'under-header': heroUnderHeader }]}>
+      {
+        trail && (
+          <div class="wrap crumb-wrap">
+            <Breadcrumbs items={trail} />
+          </div>
+        )
+      }
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<script>
+  // Site-wide motion: scroll reveals + smooth scrolling (desktop, motion allowed).
+  import Lenis from 'lenis';
+
+  let lenis: Lenis | null = null;
+  let io: IntersectionObserver | null = null;
+
+  function initMotion() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const els = document.querySelectorAll<HTMLElement>('[data-reveal]:not(.in)');
+    io?.disconnect();
+    if (reduce || !('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('in'));
+    } else {
+      io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io?.unobserve(e.target);
+            }
+          }),
+        { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+      );
+      els.forEach((el) => io!.observe(el));
+    }
+
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!reduce && fine && !lenis) {
+      lenis = new Lenis({ lerp: 0.1, autoRaf: true, anchors: { offset: -90 } });
+    }
+    if (lenis) {
+      lenis.resize();
+      lenis.scrollTo(window.scrollY, { immediate: true, force: true });
+    }
+  }
+  document.addEventListener('astro:page-load', initMotion);
+</script>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+  main {
+    padding-top: var(--header-h);
+  }
+  main.under-header {
+    padding-top: 0;
+  }
+  .crumb-wrap {
+    padding-top: 1.75rem;
+  }
+  .crumb-wrap :global(.crumbs) {
+    margin-bottom: 0;
+  }
+</style>

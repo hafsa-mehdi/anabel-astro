@@ -1,0 +1,112 @@
+businessName: Anabel's Oriental Rugs
+wordmark:
+  name: Anabel's
+  tagline: Oriental Rugs
+logo: /images/uploads/site/logo.png
+phone: 502 895 9595
+email: contact@anabelsorientalrugs.com
+address:
+  street: 3740 Frankfort Avenue
+  city: Louisville
+  region: KY
+  postalCode: '40207'
+geo:
+  latitude: '38.2528945'
+  longitude: '-85.6590950'
+mapTowns:
+  - name: Louisville
+    latitude: '38.2527'
+    longitude: '-85.7585'
+  - name: Jeffersonville
+    latitude: '38.2776'
+    longitude: '-85.7372'
+  - name: New Albany
+    latitude: '38.2856'
+    longitude: '-85.8241'
+  - name: Clarksville
+    latitude: '38.2967'
+    longitude: '-85.7597'
+  - name: Shelbyville
+    latitude: '38.2120'
+    longitude: '-85.2236'
+directionsUrl: https://goo.gl/maps/dsb3bx1L9Uxawsat6
+mapQuery: Anabel's Oriental Rugs, 3740 Frankfort Avenue, Louisville, KY 40207
+hours:
+  - label: Monday – Friday
+    days:
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+    closed: false
+    opens: '10:00'
+    closes: '17:30'
+  - label: Saturday
+    days:
+      - Saturday
+    closed: false
+    opens: '10:00'
+    closes: '16:00'
+  - label: Sunday
+    days:
+      - Sunday
+    closed: true
+    opens: ''
+    closes: ''
+social:
+  - platform: Facebook
+    url: https://www.facebook.com/anabelsorientalrugs/
+  - platform: Instagram
+    url: https://www.instagram.com/anabelsrugs/
+serviceAreas:
+  - label: Indiana
+    url: /indiana-rug-cleaning-services/
+  - label: Kentucky
+    url: /kentucky-rug-cleaning-services/
+shopUrl: https://shop.anabelsorientalrugs.com/
+headerCta:
+  label: Book cleaning
+  url: /contact/#book
+mainMenu:
+  - label: Rugs
+    url: ''
+    children:
+      - label: Shop online
+        url: https://shop.anabelsorientalrugs.com/
+      - label: Try Before You Buy
+        url: /#try-before-you-buy
+      - label: Designer program
+        url: /designer-program/
+  - label: Cleaning
+    url: /louisville-rug-cleaning/
+    children: []
+  - label: Repairs
+    url: ''
+    children:
+      - label: Hole or Tear Repair
+        url: /hole-or-tear-repair/
+      - label: Fringe Repair
+        url: /fringe-repair/
+      - label: Color Restoration
+        url: /color-restoration/
+      - label: Edge Binding
+        url: /edge-binding/
+      - label: Water Damage Restoration
+        url: /water-damage-restoration/
+      - label: Rug Reweaving
+        url: /rug-reweaving/
+  - label: Visit
+    url: /contact/
+    children: []
+  - label: About
+    url: ''
+    children:
+      - label: Meet the team
+        url: /team/
+      - label: Showroom tour
+        url: /tour/
+footerNote: >-
+  Handmade rugs, hand-washed cleaning and expert repair on Frankfort Avenue in
+  Louisville.
+formEndpoint: ''

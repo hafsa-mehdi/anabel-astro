@@ -1,0 +1,205 @@
+---
+import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
+import VisitStrip from '../components/VisitStrip.astro';
+import { mustRead, accent, paragraphs, imageInfo } from '../lib/cms';
+
+const page = await mustRead('team');
+const home = await mustRead('home');
+const story = imageInfo(page.story.image);
+const storySizes = '(min-width: 1024px) 40vw, min(20rem, 90vw)';
+---
+
+<Base
+  title={page.seo.title}
+  description={page.seo.description}
+  image={page.story.image}
+  imageAlt={page.story.imageAlt}
+  crumbs={[{ name: 'Meet the team', url: '/team/' }]}
+>
+  <section class="t-hero" aria-labelledby="t-title">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap">
+      {page.kicker && <p class="label">{page.kicker}</p>}
+      <h1 id="t-title" set:html={accent(page.heading)} />
+    </div>
+  </section>
+
+  <section class="t-story" aria-labelledby="story-title">
+    <div class="wrap t-story-grid">
+      <figure class="photo t-photo">
+        <Img src={page.story.image} alt={page.story.imageAlt} sizes={storySizes} />
+      </figure>
+      <div class="t-story-text">
+        <h2 id="story-title" set:html={accent(page.story.heading)} />
+        <blockquote>
+          {paragraphs(page.story.body).map((p) => <p>{p}</p>)}
+        </blockquote>
+        <p class="sig">Anabel</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section t-members" aria-labelledby="members-title">
+    <div class="wrap">
+      <div class="head" data-reveal>
+        <h2 id="members-title" set:html={accent(page.membersHeading)} />
+      </div>
+      <ul class="people">
+        {
+          page.members.map((m, i) => (
+            <li class="person" data-reveal style={`--i:${i % 3}`}>
+              <div class="person-photo">
+                <Img src={m.photo} alt={m.photoAlt} sizes="(min-width: 1000px) 30vw, (min-width: 640px) 45vw, 100vw" />
+              </div>
+              <div class="person-text">
+                <h3>{m.name}</h3>
+                <p>{m.bio}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <VisitStrip label={home.visit.label} heading={home.visit.heading} intro={home.visit.intro} />
+</Base>
+
+<style>
+  .t-hero {
+    position: relative;
+    overflow-x: clip;
+    isolation: isolate;
+    padding-block: 2rem 2.5rem;
+    text-align: center;
+  }
+  .glow {
+    position: absolute;
+    inset: -40% 10% -20%;
+    z-index: -1;
+    background: radial-gradient(closest-side at 35% 50%, rgba(163, 58, 46, 0.3), transparent 70%),
+      radial-gradient(closest-side at 70% 40%, rgba(43, 74, 117, 0.4), transparent 70%);
+    pointer-events: none;
+  }
+  .t-hero h1 {
+    font-size: clamp(3rem, 1.6rem + 5vw, 6rem);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .t-hero .wrap > *,
+    .t-story-text > * {
+      animation: t-rise 1s var(--ease) both;
+    }
+    .t-hero h1 {
+      animation-delay: 0.08s;
+    }
+    .t-story-text > :nth-child(2) {
+      animation-delay: 0.15s;
+    }
+  }
+  @keyframes t-rise {
+    from {
+      transform: translateY(22px);
+    }
+  }
+  .t-story {
+    padding-bottom: var(--section);
+  }
+  .t-story-grid {
+    display: grid;
+    gap: 2.5rem 5rem;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .t-story-grid {
+      grid-template-columns: 0.85fr 1.15fr;
+    }
+  }
+  .t-photo {
+    max-width: 20rem;
+    width: 100%;
+    justify-self: center;
+    order: 2; /* on phones the story comes first, then the photo */
+  }
+  @media (min-width: 1024px) {
+    .t-photo {
+      max-width: none;
+      order: 0;
+    }
+  }
+  .t-photo :global(img) {
+    aspect-ratio: 4 / 5;
+  }
+  .t-story-text h2 {
+    margin-bottom: 1rem;
+  }
+  blockquote {
+    margin: 0;
+    padding-left: 1.5rem;
+    border-left: 2px solid var(--gold);
+    font-family: var(--serif);
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+    line-height: 1.5;
+    color: #e6ddcf;
+  }
+  .sig {
+    margin-top: 1.25rem;
+    padding-left: 1.5rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--gold);
+  }
+  .people {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.6rem;
+  }
+  @media (min-width: 640px) {
+    .people {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1000px) {
+    .people {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .person {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.5s var(--ease), border-color 0.4s ease;
+  }
+  .person:hover {
+    transform: translateY(-6px);
+    border-color: rgba(212, 162, 76, 0.5);
+  }
+  .person-photo {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+  .person-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease);
+  }
+  .person:hover .person-photo :global(img) {
+    transform: scale(1.05);
+  }
+  .person-text {
+    padding: 1.5rem 1.6rem 1.75rem;
+  }
+  .person-text h3 {
+    font-size: 1.75rem;
+    margin-bottom: 0.4rem;
+  }
+  .person-text p {
+    color: var(--muted);
+    font-size: 0.97rem;
+  }
+</style>

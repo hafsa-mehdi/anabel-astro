@@ -1,0 +1,128 @@
+---
+// Hero artwork (decorative).
+// 1. A static poster image renders first and is the LCP element.
+//    Phones, reduced-motion users and browsers without WebGL only ever see the flat rug poster.
+// 2. On larger screens, after the page has loaded and the browser is idle, three.js is
+//    imported on demand and the rug unrolls on a canvas laid exactly over the poster.
+---
+
+<div class="rug-stage" data-rug-stage aria-hidden="true">
+  <picture>
+    <source
+      media="(min-width: 768px) and (prefers-reduced-motion: no-preference)"
+      srcset="/images/hero/rug-rolled-700.webp 700w, /images/hero/rug-rolled-1400.webp 1400w"
+      sizes="(min-width: 1024px) 52vw, 92vw"
+    />
+    <img
+      class="rug-poster"
+      src="/images/hero/rug-flat-700.webp"
+      srcset="/images/hero/rug-flat-700.webp 700w, /images/hero/rug-flat-1400.webp 1400w"
+      sizes="(min-width: 1024px) 52vw, 92vw"
+      width="1400"
+      height="967"
+      alt=""
+      fetchpriority="high"
+      decoding="async"
+    />
+  </picture>
+</div>
+
+<script>
+  import type { mountRug as MountRug } from '../scripts/rug3d';
+
+  let live: ReturnType<typeof MountRug> | null = null;
+
+  function useFlatPoster(stage: HTMLElement) {
+    // Remove the "rolled" desktop source so the flat rug shows instead
+    stage.querySelector('source')?.remove();
+  }
+
+  function hasWebGL() {
+    try {
+      const c = document.createElement('canvas');
+      const gl = (c.getContext('webgl2') || c.getContext('webgl')) as WebGLRenderingContext | null;
+      gl?.getExtension('WEBGL_lose_context')?.loseContext();
+      return !!gl;
+    } catch {
+      return false;
+    }
+  }
+
+  function whenIdle(fn: () => void) {
+    const run = () => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 200));
+    if (document.readyState === 'complete') run();
+    else window.addEventListener('load', run, { once: true });
+  }
+
+  function init() {
+    const stage = document.querySelector<HTMLElement>('[data-rug-stage]');
+    if (!stage || stage.dataset.mounted) return;
+    const wanted = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches;
+    if (!wanted) return;
+    if (!hasWebGL()) return useFlatPoster(stage);
+    stage.dataset.mounted = '1';
+
+    whenIdle(async () => {
+      try {
+        const { mountRug } = await import('../scripts/rug3d');
+        if (!stage.isConnected) return;
+        live = mountRug(stage, {
+          startT: 0.15,
+          delay: 700,
+          duration: 1600,
+          onReady: () => stage.classList.add('is-live'),
+        });
+      } catch (err) {
+        console.warn('3D rug unavailable, showing the image instead.', err);
+        useFlatPoster(stage);
+      }
+    });
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
+  // Free the WebGL context when navigating away with View Transitions
+  document.addEventListener('astro:before-swap', () => {
+    live?.dispose();
+    live = null;
+  });
+</script>
+
+<style>
+  .rug-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1400 / 967;
+  }
+  .rug-stage::after {
+    /* warm pool of light under the rug */
+    content: '';
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: 8%;
+    height: 20%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgba(212, 162, 76, 0.2), transparent);
+  }
+  .rug-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    transition: opacity 0.15s linear 0.22s;
+  }
+  .rug-stage :global(.rug-canvas) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.2s linear;
+  }
+  .rug-stage.is-live :global(.rug-canvas) {
+    opacity: 1;
+  }
+  .rug-stage.is-live .rug-poster {
+    opacity: 0;
+  }
+</style>

@@ -1,0 +1,219 @@
+---
+import Icon from './Icon.astro';
+import SmartLink from './SmartLink.astro';
+import { getSettings, telHref, hoursText, addressLines } from '../lib/cms';
+
+const s = await getSettings();
+const year = new Date().getFullYear();
+const explore = [
+  { label: 'Rug cleaning', url: '/louisville-rug-cleaning/' },
+  { label: 'Hole or tear repair', url: '/hole-or-tear-repair/' },
+  { label: 'Visit & contact', url: '/contact/' },
+  { label: 'Meet the team', url: '/team/' },
+  { label: 'Showroom tour', url: '/tour/' },
+  { label: 'Designer program', url: '/designer-program/' },
+  { label: 'Blog', url: '/blog/' },
+  { label: 'Shop online', url: s.shopUrl ?? 'https://shop.anabelsorientalrugs.com/' },
+];
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="f-brand">
+      <a href="/" class="f-logo" aria-label={`${s.businessName}, home`}>
+        <span class="f-name">{s.wordmark?.name || s.businessName}</span>
+        {s.wordmark?.tagline && <span class="f-tag">{s.wordmark.tagline}</span>}
+      </a>
+      <p>{s.footerNote}</p>
+      <ul class="f-social">
+        {
+          s.social.map((x) => (
+            <li>
+              <a href={x.url} rel="me noopener">
+                <Icon name={x.platform === 'Instagram' ? 'instagram' : 'facebook'} />
+                <span class="sr-only">{s.businessName} on </span>
+                {x.platform}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="f-title">Visit</h2>
+      <address>
+        <a href={s.directionsUrl ?? '/contact/'}>{addressLines(s).map((l) => <span class="line">{l}</span>)}</a>
+        <a href={telHref(s.phone)}>{s.phone}</a>
+        <a href={`mailto:${s.email}`}>{s.email}</a>
+      </address>
+    </div>
+
+    <div>
+      <h2 class="f-title">Hours</h2>
+      <dl class="f-hours">
+        {
+          s.hours.map((h) => (
+            <div>
+              <dt>{h.label}</dt>
+              <dd>{hoursText(h)}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <nav aria-label="Footer">
+      <h2 class="f-title">Explore</h2>
+      <ul class="f-links">
+        {
+          explore.map((l) => (
+            <li>
+              <SmartLink href={l.url}>{l.label}</SmartLink>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap f-legal">
+    <p>© {year} {s.businessName}</p>
+    <p>Website by <a href="https://iorso.com">iORSO</a></p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--bg2);
+    color: var(--muted);
+    font-size: 0.97rem;
+    padding-bottom: 5.5rem;
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 1024px) {
+    .site-footer {
+      padding-bottom: 0;
+    }
+  }
+  .site-footer a {
+    color: var(--ivory);
+    text-decoration-color: rgba(212, 162, 76, 0.45);
+  }
+  .site-footer a:hover {
+    color: var(--gold);
+  }
+  .footer-grid {
+    display: grid;
+    gap: 2.5rem 2rem;
+    padding-block: 4.5rem 3rem;
+  }
+  @media (min-width: 700px) {
+    .footer-grid {
+      grid-template-columns: 1.3fr 1fr;
+    }
+  }
+  @media (min-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 1.4fr 1fr 1fr 0.9fr;
+    }
+  }
+  .f-logo {
+    display: inline-grid;
+    text-decoration: none;
+    line-height: 1;
+    margin-bottom: 1.25rem;
+  }
+  .f-name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 2.4rem;
+    color: var(--ivory);
+  }
+  .f-tag {
+    margin-top: 0.35rem;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .f-brand p {
+    max-width: 32ch;
+  }
+  .f-title {
+    font-family: var(--sans);
+    color: var(--gold);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+  }
+  address {
+    font-style: normal;
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+  address .line {
+    display: block;
+  }
+  .f-hours {
+    margin: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .f-hours div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.4rem;
+  }
+  .f-hours dt {
+    font-weight: 700;
+    color: var(--ivory);
+  }
+  .f-hours dd {
+    margin: 0;
+  }
+  .f-links,
+  .f-social {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .f-social {
+    grid-auto-flow: column;
+    justify-content: start;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+  }
+  .f-social a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.75rem;
+  }
+  .f-social :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--gold);
+  }
+  .f-legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    padding-block: 1.4rem 1.6rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.88rem;
+  }
+  .f-legal p {
+    margin: 0;
+  }
+</style>

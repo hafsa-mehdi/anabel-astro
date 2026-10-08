@@ -1,0 +1,124 @@
+---
+// One route for two kinds of root-level pages, so URLs stay identical to the live site:
+//   /hole-or-tear-repair/ (and future repair pages) → Keystatic "Repair pages"
+//   /the-art-of-rug-cleaning-.../ (blog posts)       → src/content/posts
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import RepairPage from '../components/RepairPage.astro';
+import PostPage from '../components/PostPage.astro';
+import AreaPage from '../components/AreaPage.astro';
+import { reader, getSettings, markdocToHtml, mustRead, imageInfo } from '../lib/cms';
+import { service, blogPosting } from '../lib/schema';
+
+export async function getStaticPaths() {
+  const repairs = await reader.collections.repairs.all({ resolveLinkedFiles: true });
+  const areas = await reader.collections.areas.all();
+  const posts = await getCollection('posts');
+  return [
+    ...areas.map((a) => ({ params: { slug: a.slug }, props: { kind: 'area' as const, slug: a.slug } })),
+    ...repairs.map((r) => ({ params: { slug: r.slug }, props: { kind: 'repair' as const, slug: r.slug } })),
+    ...posts.map((p) => ({ params: { slug: p.id }, props: { kind: 'post' as const, slug: p.id } })),
+  ];
+}
+
+const { kind, slug } = Astro.props as { kind: 'repair' | 'post' | 'area'; slug: string };
+const area = kind === 'area' ? await reader.collections.areas.read(slug) : null;
+const areaHero = area ? imageInfo(area.heroImage) : null;
+const s = await getSettings();
+const site = Astro.site!;
+const url = new URL(Astro.url.pathname, site).href;
+const cleaning = await mustRead('cleaning');
+const posts = await getCollection('posts');
+const latestPost = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
+
+let repair: Awaited<ReturnType<typeof reader.collections.repairs.read>> = null;
+let bodyHtml = '';
+let post: CollectionEntry<'posts'> | undefined;
+if (kind === 'repair') {
+  repair = await reader.collections.repairs.read(slug, { resolveLinkedFiles: true });
+  bodyHtml = await markdocToHtml(repair?.body as any);
+} else {
+  post = posts.find((p) => p.id === slug);
+}
+
+const cleaningLink = { label: 'Rug cleaning in Louisville', url: '/louisville-rug-cleaning/', text: cleaning.lead };
+const holeRepair = await reader.collections.repairs.read('hole-or-tear-repair');
+const repairHero = repair ? imageInfo(repair.heroImage) : null;
+---
+
+{
+  kind === 'repair' && repair && (
+    <Base
+      title={repair.seoTitle}
+      description={repair.seoDescription}
+      image={repair.heroImage}
+      imageAlt={repair.heroAlt}
+      crumbs={[{ name: repair.title, url: `/${slug}/` }]}
+      preloadImage={repairHero ? { href: repairHero.fallback, srcset: repairHero.srcset, sizes: '(min-width: 1024px) 50vw, 100vw' } : undefined}
+      jsonLd={[service({ name: repair.title, serviceType: 'Rug repair', description: repair.seoDescription, url, s })]}
+    >
+      <RepairPage
+        slug={slug}
+        entry={repair}
+        bodyHtml={bodyHtml}
+        related={[
+          cleaningLink,
+          ...(latestPost
+            ? [{ label: latestPost.data.title, url: `/${latestPost.id}/`, text: latestPost.data.description.split('. ')[0] + '.' }]
+            : []),
+        ]}
+      />
+    </Base>
+  )
+}
+{
+  kind === 'post' && post && (
+    <Base
+      title={`${post.data.title} | Anabel's`}
+      description={post.data.description.length > 160 ? post.data.description.slice(0, 157).replace(/\s+\S*$/, '') + '…' : post.data.description}
+      image={post.data.heroImage ? new URL(post.data.heroImage.src, site).href : undefined}
+      imageAlt={post.data.heroAlt}
+      type="article"
+      crumbs={[
+        { name: 'Blog', url: '/blog/' },
+        { name: post.data.title, url: `/${post.id}/` },
+      ]}
+      jsonLd={[
+        blogPosting({
+          title: post.data.title,
+          description: post.data.description,
+          url,
+          image: post.data.heroImage ? new URL(post.data.heroImage.src, site).href : undefined,
+          date: post.data.pubDate,
+          s,
+        }),
+      ]}
+    >
+      <PostPage
+        post={post}
+        related={[
+          cleaningLink,
+          ...(holeRepair ? [{ label: holeRepair.title, url: '/hole-or-tear-repair/', text: holeRepair.intro }] : []),
+        ]}
+      />
+    </Base>
+  )
+}
+{
+  kind === 'area' && area && (
+    <Base
+      title={area.seoTitle}
+      description={area.seoDescription}
+      image={area.heroImage}
+      imageAlt={area.heroAlt}
+      crumbs={[
+        { name: 'Visit & contact', url: '/contact/' },
+        { name: area.title, url: `/${slug}/` },
+      ]}
+      preloadImage={areaHero ? { href: areaHero.fallback, srcset: areaHero.srcset, sizes: '(min-width: 1024px) 45vw, 100vw' } : undefined}
+      jsonLd={[service({ name: area.title, serviceType: 'Rug cleaning', description: area.seoDescription, url, s })]}
+    >
+      <AreaPage entry={area} />
+    </Base>
+  )
+}
