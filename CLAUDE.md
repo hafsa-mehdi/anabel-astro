@@ -1,6 +1,7 @@
 ## Project notes
 - Astro 7 static site + @astrojs/vercel adapter (only Keystatic routes are on-demand). Keystatic: GitHub mode in prod (repo hafsa-mehdi/anabel-astro), local mode in dev unless PUBLIC_KEYSTATIC_STORAGE=github. See README.txt.
 - trailingSlash 'ignore' everywhere; scripts/vercel-routes.mjs (postbuild) adds the slash redirect + font caching to .vercel/output/config.json.
+- @astrojs/vercel is pinned to 11.0.12: 11.0.13 bundles rolldown into the function without its native binding (FUNCTION_INVOCATION_FAILED on Vercel). Test upgrades by running the function copied outside the project.
 - Uploaded images: public/images/uploads/<folder>/ → resized by scripts/optimize-uploads.mjs (predev/prebuild) into public/images/_r + src/generated/image-manifest.json. Use <Img> component.
 - Blog posts and repair pages share the root route src/pages/[slug].astro.
 - Design: "Dark gallery" (global.css tokens). Headings support *accent* via accent() in lib/cms.ts.
