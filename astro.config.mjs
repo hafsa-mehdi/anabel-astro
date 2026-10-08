@@ -4,10 +4,10 @@ import react from '@astrojs/react';
 import markdoc from '@astrojs/markdoc';
 import sitemap from '@astrojs/sitemap';
 import keystatic from '@keystatic/astro';
+import vercel from '@astrojs/vercel';
 
-// The Keystatic admin panel (/keystatic) runs only while developing locally
-// (`npm run dev`). `npm run build` produces plain static HTML with no admin attached.
-const isDev = process.argv.includes('dev');
+// Every page is pre-built static HTML. Only the Keystatic admin (/keystatic and
+// /api/keystatic) runs on demand, as a Vercel function.
 
 // On a Vercel test deployment, links, share images and canonical URLs use the Vercel address
 // (the live domain does not have these files yet). Set SITE_INDEXING=true when this build
@@ -21,14 +21,16 @@ const site =
 export default defineConfig({
   site,
   output: 'static',
-  // Live URLs end in a slash. The Keystatic admin API needs 'ignore' while developing.
-  trailingSlash: isDev ? 'ignore' : 'always',
+  adapter: vercel(),
+  // Page links are written with a trailing slash (like the live site) and Vercel adds a
+  // missing slash with a redirect (vercel.json). 'ignore' keeps the Keystatic admin API working.
+  trailingSlash: 'ignore',
   build: { format: 'directory', inlineStylesheets: 'always' },
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
   integrations: [
     react(),
     markdoc(),
     sitemap({ filter: (page) => !page.includes('/404') }),
-    ...(isDev ? [keystatic()] : []),
+    keystatic(),
   ],
 });

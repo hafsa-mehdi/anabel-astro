@@ -2,8 +2,10 @@ import { config, fields, collection, singleton } from '@keystatic/core';
 
 // ---------------------------------------------------------------------------
 // Keystatic admin panel for Anabel's Oriental Rugs.
-// Open it at http://127.0.0.1:4321/keystatic while `npm run dev` is running.
-// Everything is saved as files inside this project (local mode).
+//  - Online (Vercel): https://<your-site>/keystatic. Log in with GitHub; every Save
+//    becomes a commit in the GitHub repo and Vercel redeploys the site.
+//  - On this computer: `npm run dev`, then http://127.0.0.1:4321/keystatic.
+//    Saves go straight into the files of this folder (local mode).
 // ---------------------------------------------------------------------------
 
 // Shared helpers -------------------------------------------------------------
@@ -71,8 +73,14 @@ const imagePosition = fields.select({
 
 // ---------------------------------------------------------------------------
 
+// GitHub repository the online admin saves to
+const GITHUB_REPO = 'hafsa-mehdi/anabel-astro';
+// Online builds always use GitHub. Locally, set PUBLIC_KEYSTATIC_STORAGE=github to
+// use GitHub mode too (needed once, for the GitHub App setup screen).
+const useGitHub = import.meta.env.PROD || import.meta.env.PUBLIC_KEYSTATIC_STORAGE === 'github';
+
 export default config({
-  storage: { kind: 'local' },
+  storage: useGitHub ? { kind: 'github', repo: GITHUB_REPO } : { kind: 'local' },
   ui: {
     brand: { name: "Anabel's Oriental Rugs" },
     navigation: {

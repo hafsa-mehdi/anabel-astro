@@ -2,7 +2,7 @@ Anabel's Oriental Rugs: Astro + Keystatic rebuild ("Dark gallery" design)
 =========================================================================
 
 A fast, SEO-ready rebuild of five pages of anabelsorientalrugs.com.
-Astro 7 (static HTML) + Keystatic (admin panel, local mode).
+Astro 7 (static HTML) + Keystatic (admin panel: online on Vercel, or locally).
 It is a test build for the Astro + CMS evaluation, not the live site.
 
 Pages (URLs identical to the live WordPress site)
@@ -35,15 +35,14 @@ Needs Node 22.12 or newer.
   npm run dev        website + admin panel while you work
                        Website: http://127.0.0.1:4321
                        Admin:   http://127.0.0.1:4321/keystatic
-  npm run build      makes the finished static site in dist/
-  npm run preview    serves dist/ at http://localhost:4321 to check it
+  npm run build      makes the finished site for Vercel in .vercel/output/
 
 "npm run dev" and "npm run build" first run scripts/optimize-uploads.mjs,
 which makes resized WebP copies of every uploaded photo (public/images/_r/).
 Those copies are recreated automatically; never edit them.
 
-The admin panel only exists during "npm run dev". The built site is plain
-HTML with no admin attached.
+Every page is built as plain static HTML. Only the admin panel (/keystatic)
+runs on demand, as a small Vercel function.
 
 
 2. PUT IT ON VERCEL (to send your boss a link)
@@ -66,8 +65,44 @@ never competes with the real one. Only when this build replaces the live
 site: Vercel > Project > Settings > Environment Variables > add
 SITE_INDEXING = true, then redeploy.
 
-Editing on Vercel: Keystatic runs in local mode, so edits are made on this
-computer with "npm run dev", then pushed to GitHub; Vercel redeploys.
+
+2b. ONLINE ADMIN PANEL (Keystatic on Vercel, GitHub mode)
+--------------------------------------------------------
+Online, Keystatic saves through GitHub: log in at https://<your-site>/keystatic
+with a GitHub account that has access to the repository (hafsa-mehdi/anabel-astro).
+Each Save is a commit; Vercel then rebuilds the site (1-2 minutes).
+
+One-time setup
+  1. On this computer, in PowerShell inside the project folder:
+       $env:PUBLIC_KEYSTATIC_STORAGE="github"; npm run dev
+  2. Open http://127.0.0.1:4321/keystatic and click "Log in with GitHub".
+     The Keystatic Setup page opens.
+  3. "Deployed App URL": your Vercel address, e.g. https://anabel-astro.vercel.app
+     Leave the organization empty (unless the repo belongs to one), click
+     "Create GitHub App", give it a name and confirm on GitHub.
+  4. GitHub asks where to install the app: choose "Only select repositories"
+     > anabel-astro > Install.
+  5. Keystatic has now written 4 values into the .env file in this folder:
+       KEYSTATIC_GITHUB_CLIENT_ID
+       KEYSTATIC_GITHUB_CLIENT_SECRET
+       KEYSTATIC_SECRET
+       PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
+     Copy all four to Vercel > Project > Settings > Environment Variables
+     (all environments), then Deployments > ... > Redeploy.
+     .env is never uploaded to GitHub; keep these values private.
+  6. Stop the dev server (Ctrl+C) and close PowerShell, so the next
+     "npm run dev" is back in local mode.
+
+Adding editors: GitHub repo > Settings > Collaborators > add their GitHub
+account (Write access). They then log in at /keystatic.
+If the site later moves to its own domain, add that domain's callback URL
+(https://<domain>/api/keystatic/github/oauth/callback) in the GitHub App
+settings (github.com > Settings > Developer settings > GitHub Apps).
+
+Two ways to edit, same content
+  - Online: /keystatic on the Vercel site (saves to GitHub).
+  - Locally: "npm run dev" (saves to this folder). Run "git pull" first so
+    you have the latest online edits, and "git push" afterwards.
 
 
 3. WHERE EACH PIECE OF CONTENT LIVES
@@ -149,8 +184,7 @@ Tips
 7. KNOWN GAPS
 -------------
 - Form backend is not connected yet (see section 4).
-- Keystatic local mode works on this computer only. Editing on the hosted
-  site later needs Keystatic's GitHub mode.
+- The online admin needs the one-time GitHub App setup in section 2b.
 - The 5 reviews were copied word for word from the live site's Google
   reviews widget (TrustIndex). New reviews have to be added by hand; ask the
   client before showing reviewers' names.

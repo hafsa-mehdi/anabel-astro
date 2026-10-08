@@ -12,13 +12,14 @@
     "dev": "astro dev",
     "prebuild": "node scripts/optimize-uploads.mjs",
     "build": "astro build",
-    "preview": "astro preview",
+    "postbuild": "node scripts/vercel-routes.mjs",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/markdoc": "^2.0.11",
     "@astrojs/react": "^7.0.1",
     "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/vercel": "^11.0.13",
     "@keystatic/astro": "^6.0.0",
     "@keystatic/core": "^0.6.9",
     "@markdoc/markdoc": "^0.5.10",
@@ -34,5 +35,10 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.186.0"
+  },
+  "overrides": {
+    "@vercel/routing-utils": {
+      "path-to-regexp": "6.3.0"
+    }
   }
 }
