@@ -1,0 +1,7 @@
+# Not part of the website upload ("vercel deploy" from this folder)
+cms
+.env
+.env.*
+_old-build
+Claude outputs
+dist
