@@ -44,6 +44,8 @@ export default buildConfig({
     // Online only: photos go to Vercel Blob (local work keeps them in ./media).
     vercelBlobStorage({
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+      // Same database columns with or without the token (local and online share migrations)
+      alwaysInsertFields: true,
       collections: { media: true },
       token: process.env.BLOB_READ_WRITE_TOKEN,
     }),
