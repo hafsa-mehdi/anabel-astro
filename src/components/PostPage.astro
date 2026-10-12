@@ -2,16 +2,18 @@
 // Template for blog posts (src/content/posts/*.md).
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
 import RelatedLinks from './RelatedLinks.astro';
-import { mustRead } from '../lib/cms';
+import { mustRead, type PostEntry } from '../lib/cms';
 
 interface Props {
-  post: CollectionEntry<'posts'>;
+  post: PostEntry;
   related: { label: string; url: string; text: string }[];
 }
 const { post, related } = Astro.props;
-const { Content } = await render(post);
+// Live preview posts carry their text as HTML and their photo as a URL
+const previewHtml = 'previewHtml' in post ? post.previewHtml : null;
+const { Content } = 'previewHtml' in post ? { Content: null } : await render(post);
+const hero = post.data.heroImage;
 const home = await mustRead('home');
 const cleaning = await mustRead('cleaning');
 const date = post.data.pubDate;
@@ -24,10 +26,17 @@ const dateText = date.toLocaleDateString('en-US', { year: 'numeric', month: 'lon
     <h1>{post.data.title}</h1>
   </header>
   {
-    post.data.heroImage && (
+    typeof hero === 'string' && (
+      <figure class="wrap post-hero">
+        <img src={hero} alt={post.data.heroAlt} loading="eager" fetchpriority="high" />
+      </figure>
+    )
+  }
+  {
+    hero && typeof hero !== 'string' && (
       <figure class="wrap post-hero">
         <Image
-          src={post.data.heroImage}
+          src={hero}
           alt={post.data.heroAlt}
           widths={[480, 640, 800, 1200, 1600]}
           sizes="(min-width: 900px) 832px, 100vw"
@@ -41,7 +50,7 @@ const dateText = date.toLocaleDateString('en-US', { year: 'numeric', month: 'lon
   }
   <div class="wrap">
     <div class="prose post-body">
-      <Content />
+      {Content ? <Content /> : <Fragment set:html={previewHtml} />}
     </div>
   </div>
 

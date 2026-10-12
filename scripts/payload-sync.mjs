@@ -11,6 +11,7 @@
 //   src/generated/payload-assets/<file>       blog post photos (Astro's image pipeline needs them in src/)
 import { mkdir, writeFile, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { COLLECTIONS, GLOBALS, mediaUrl, shapeContent } from '../src/lib/payload-normalize.mjs';
 
 if (process.env.CMS !== 'payload') process.exit(0);
 
@@ -19,13 +20,6 @@ const ROOT = process.cwd();
 const OUT_JSON = path.join(ROOT, 'src', 'generated', 'payload-content.json');
 const PUBLIC_DIR = path.join(ROOT, 'public', 'images', 'uploads', '_payload');
 const ASSET_DIR = path.join(ROOT, 'src', 'generated', 'payload-assets');
-
-const GLOBALS = ['settings', 'home', 'cleaning', 'visit', 'team', 'tour', 'designers', 'blog'];
-const COLLECTIONS = ['repairs', 'areas', 'posts', 'testimonials'];
-// Payload-only fields the site does not use
-const DROP = new Set(['id', 'createdAt', 'updatedAt', 'globalType', '_status', 'generateSlug']);
-// Rich text JSON (Lexical); the site uses the HTML copy Payload adds next to it (bodyHtml, contentHtml)
-const isRichText = (v) => v && typeof v === 'object' && v.root && typeof v.root === 'object';
 
 async function get(apiPath) {
   let res;
@@ -38,15 +32,12 @@ async function get(apiPath) {
   return res.json();
 }
 
-const isMedia = (v) => v && typeof v === 'object' && typeof v.filename === 'string' && 'mimeType' in v;
-const isTextItem = (v) => v && typeof v === 'object' && Object.keys(v).every((k) => k === 'id' || k === 'value') && 'value' in v;
-
-const downloads = new Map(); // target file → source url
+const downloads = new Map(); // target file → { url, size }
 
 /** Photo → local path. Blog photos go to src/ for astro:assets, everything else to public/. */
-function mediaPath(m, forAstroAssets) {
-  const url = /^https?:\/\//.test(m.url) ? m.url : BASE + m.url;
-  if (forAstroAssets) {
+function mediaPath(m, collection) {
+  const url = mediaUrl(m, BASE);
+  if (collection === 'posts') {
     downloads.set(path.join(ASSET_DIR, m.filename), { url, size: m.filesize });
     return `./payload-assets/${m.filename}`;
   }
@@ -54,32 +45,10 @@ function mediaPath(m, forAstroAssets) {
   return `/images/uploads/_payload/${m.filename}`;
 }
 
-/** Payload document → the plain shape Keystatic's reader returns. */
-function normalize(value, opts) {
-  if (isMedia(value)) return mediaPath(value, opts.astroAssets);
-  if (Array.isArray(value)) {
-    if (value.length && value.every(isTextItem)) return value.map((v) => v.value ?? '');
-    return value.map((v) => normalize(v, opts));
-  }
-  if (value && typeof value === 'object') {
-    const out = {};
-    for (const [k, v] of Object.entries(value)) if (!DROP.has(k) && !isRichText(v)) out[k] = normalize(v, opts);
-    return out;
-  }
-  return value ?? null;
-}
-
-const content = {};
-for (const slug of GLOBALS) content[slug] = normalize(await get(`/api/globals/${slug}?depth=1`), {});
-for (const slug of COLLECTIONS) {
-  const { docs } = await get(`/api/${slug}?depth=1&limit=1000&sort=createdAt`);
-  content[slug] = docs.map((doc) => {
-    const entry = normalize(doc, { astroAssets: slug === 'posts' });
-    // Keystatic dates are "YYYY-MM-DD"
-    for (const k of ['pubDate', 'date']) if (entry[k]) entry[k] = String(entry[k]).slice(0, 10);
-    return { slug: doc.slug ?? String(doc.id), entry };
-  });
-}
+const raw = { globals: {}, collections: {} };
+for (const slug of GLOBALS) raw.globals[slug] = await get(`/api/globals/${slug}?depth=1`);
+for (const slug of COLLECTIONS) raw.collections[slug] = (await get(`/api/${slug}?depth=1&limit=1000&sort=createdAt`)).docs;
+const content = shapeContent(raw, mediaPath);
 
 // Photos: download new or changed files only
 let fetched = 0;

@@ -18,14 +18,18 @@ import {
 } from '../fields'
 import { rebuildAfterGlobalChange } from '../hooks/rebuild'
 
-// Every page: drafts + version history, and the site rebuilds when a change is published.
+// Every page: drafts (autosaved while typing, for the live preview) + version history;
+// the site rebuilds when a change is published.
 const page = (slug: string, label: string, fields: GlobalConfig['fields']): GlobalConfig => ({
   slug,
   label,
   admin: { group: slug === 'blog' ? 'Blog' : 'Pages' },
   access: { read: () => true },
   hooks: { afterChange: [rebuildAfterGlobalChange] },
-  versions: { drafts: true, max: 50 },
+  versions: { drafts: { autosave: { interval: 1500 } }, max: 50 },
+  // Payload's "is there a published version?" check only selects updatedAt; without _status it
+  // always answers no, and the editor shows "Draft" instead of "Changed — Revert to published".
+  forceSelect: { _status: true },
   fields,
 })
 

@@ -23,6 +23,7 @@ import { Media } from './collections/Media'
 import { Areas, Posts, Repairs, Testimonials } from './collections/content'
 import { Settings } from './globals/Settings'
 import { pageGlobals } from './globals/pages'
+import { livePreview, previewContentEndpoint } from './livePreview'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -37,6 +38,7 @@ export default buildConfig({
       graphics: { Logo: '/components/Logo#Logo', Icon: '/components/Icon#Icon' },
       actions: ['/components/ViewSite#ViewSite'],
     },
+    livePreview,
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -44,6 +46,7 @@ export default buildConfig({
   collections: [Repairs, Areas, Posts, Testimonials, Media, Users],
   globals: [...pageGlobals, Settings],
   // Only what the website's text styles support: H2/H3, bold, italic, lists, quotes, links.
+  endpoints: [previewContentEndpoint],
   editor: lexicalEditor({
     features: () => [
       ParagraphFeature(),

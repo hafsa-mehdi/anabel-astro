@@ -65,8 +65,11 @@ Optional: CMS project > Settings > Git > Ignored Build Step:
 
 ## Editing (what editors get)
 
-- **Drafts:** "Save Draft" keeps a change private; "Publish changes" puts it live and rebuilds
-  the site. Every page has a version history (Versions tab) with "Revert to published".
+- **Drafts:** changes autosave as a private draft while you type; "Publish changes" puts them
+  live and rebuilds the site. Every page has a version history (Versions tab) with
+  "Revert to published".
+- **Live preview** (eye icon next to Publish): the real website beside the form, showing the
+  draft. It reloads after each autosave; phone / tablet / desktop sizes at the top.
 - **Tabs** on long pages (Homepage, Site settings, Cleaning page; Content / SEO elsewhere).
 - **List items named by their content** ("Rug cleaning", not "Card 01").
 - **Page address** fills itself in from the title on the first save, then stays locked
@@ -76,6 +79,19 @@ Optional: CMS project > Settings > Git > Ignored Build Step:
 - **Alt text** is required as soon as a photo is chosen (checked on Publish).
 - **Branding:** Anabel's wordmark and the site's dark colours; "View website" in the top bar
   (`SITE_URL`, defaults to the Payload version of the site).
+
+## How the live preview works
+
+1. The preview panel opens `<SITE_URL>/preview/<page>/?secret=<PREVIEW_SECRET>` on the
+   Payload version of the website: an on-demand page (`src/pages/preview/`), not a built one.
+2. `src/middleware.ts` there fetches the latest drafts from this CMS at
+   `/api/preview-content?secret=…` (`src/livePreview.ts`) and renders the page with them,
+   using the same page layouts as the built site (`src/views/`).
+3. After each autosave the admin tells the preview to reload.
+
+Settings: `PREVIEW_SECRET` on the CMS only (any long random string; without it the preview
+shows "not allowed"). `SITE_URL` on the CMS, `PAYLOAD_URL` on the site (both already set).
+Photos uploaded but not yet published load straight from the CMS in the preview.
 
 ## Changing fields
 

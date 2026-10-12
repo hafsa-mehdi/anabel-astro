@@ -10,7 +10,8 @@ export const Settings: GlobalConfig = {
   admin: { group: 'Site-wide' },
   access: { read: () => true },
   hooks: { afterChange: [rebuildAfterGlobalChange] },
-  versions: { drafts: true, max: 50 },
+  versions: { drafts: { autosave: { interval: 1500 } }, max: 50 },
+  forceSelect: { _status: true }, // see globals/pages.ts
   fields: [
     tabs(
       [

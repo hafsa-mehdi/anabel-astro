@@ -1,0 +1,176 @@
+---
+import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import ShowroomMap from '../components/ShowroomMap.astro';
+import { getSettings, mustRead, accent, imageInfo, telHref } from '../lib/cms';
+
+const s = await getSettings();
+const page = await mustRead('tour');
+const home = await mustRead('home');
+const poster = imageInfo(page.image);
+const posterSizes = '(min-width: 1280px) 1200px, 100vw';
+---
+
+<Base
+  title={page.seo.title}
+  description={page.seo.description}
+  image={page.image}
+  imageAlt={page.imageAlt}
+  crumbs={[{ name: 'Showroom tour', url: '/tour/' }]}
+  preloadImage={poster ? { href: poster.fallback, srcset: poster.srcset, sizes: posterSizes } : undefined}
+>
+  <section class="tour-hero" aria-labelledby="tour-title">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap tour-head">
+      {page.kicker && <p class="label">{page.kicker}</p>}
+      <h1 id="tour-title" set:html={accent(page.heading)} />
+      <p class="lead">{page.intro}</p>
+    </div>
+    <div class="wrap">
+      <!-- The 360° view only loads when a visitor asks for it, so the page stays fast -->
+      <div class="tour-frame" data-tour data-src={page.tourUrl ?? ''}>
+        <Img src={page.image} alt={page.imageAlt} sizes={posterSizes} priority class="tour-poster" />
+        {
+          page.tourUrl && (
+            <button class="btn tour-start" type="button" data-tour-start>
+              Start the 360° tour
+            </button>
+          )
+        }
+      </div>
+      <div class="btn-row tour-ctas">
+        <a class="btn btn-quiet" href={s.directionsUrl ?? '/contact/'}>Get directions</a>
+        <a class="btn btn-quiet" href={telHref(s.phone)}><Icon name="phone" /> {s.phone}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tour-visit">
+    <div class="wrap">
+      <ShowroomMap label={home.visit.label} heading={home.visit.heading} intro={home.visit.intro} />
+    </div>
+  </section>
+</Base>
+
+<script>
+  function initTour() {
+    const frame = document.querySelector<HTMLElement>('[data-tour]');
+    const btn = frame?.querySelector<HTMLButtonElement>('[data-tour-start]');
+    if (!frame || !btn || btn.dataset.ready) return;
+    btn.dataset.ready = '1';
+    btn.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = frame.dataset.src!;
+      iframe.title = '360° view inside the Anabel’s Oriental Rugs showroom';
+      iframe.allow = 'fullscreen; accelerometer; gyroscope';
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      frame.appendChild(iframe);
+      frame.classList.add('is-live');
+      iframe.focus();
+    });
+  }
+  initTour();
+  document.addEventListener('astro:page-load', initTour);
+</script>
+
+<style>
+  .tour-hero {
+    position: relative;
+    overflow-x: clip;
+    isolation: isolate;
+    padding-block: 2rem var(--section);
+  }
+  .glow {
+    position: absolute;
+    inset: -30% 10% 40%;
+    z-index: -1;
+    background: radial-gradient(closest-side at 35% 50%, rgba(163, 58, 46, 0.3), transparent 70%),
+      radial-gradient(closest-side at 70% 40%, rgba(43, 74, 117, 0.4), transparent 70%);
+    pointer-events: none;
+  }
+  .tour-head {
+    text-align: center;
+    max-width: calc(46rem + 2 * var(--gutter));
+    margin-bottom: 2.5rem;
+  }
+  .tour-head h1 {
+    font-size: clamp(3rem, 1.6rem + 5vw, 6rem);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tour-head > * {
+      animation: tour-rise 1s var(--ease) both;
+    }
+    .tour-head > :nth-child(2) {
+      animation-delay: 0.08s;
+    }
+    .tour-head > :nth-child(3) {
+      animation-delay: 0.16s;
+    }
+  }
+  @keyframes tour-rise {
+    from {
+      transform: translateY(22px);
+    }
+  }
+  .tour-frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--panel);
+  }
+  @media (max-width: 699.98px) {
+    .tour-frame {
+      aspect-ratio: 4 / 5;
+    }
+  }
+  .tour-frame :global(.tour-poster) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7);
+  }
+  .tour-frame :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .tour-start {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-height: 3.6rem;
+    padding-inline: 2rem;
+    font-size: 1.05rem;
+    box-shadow: 0 0 0 0 rgba(212, 162, 76, 0.6);
+    animation: tour-pulse 2.4s infinite;
+  }
+  .tour-start:hover {
+    transform: translate(-50%, calc(-50% - 2px));
+  }
+  @keyframes tour-pulse {
+    70% {
+      box-shadow: 0 0 0 22px rgba(212, 162, 76, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(212, 162, 76, 0);
+    }
+  }
+  .is-live .tour-start,
+  .is-live :global(.tour-poster) {
+    display: none;
+  }
+  .tour-ctas {
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+  .tour-visit {
+    padding-top: 0;
+  }
+</style>

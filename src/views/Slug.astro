@@ -1,0 +1,115 @@
+---
+// Layout of the root-level pages served by src/pages/[slug].astro (and the CMS live preview):
+//   /hole-or-tear-repair/ (and future repair pages) → CMS "Repair pages"
+//   /indiana-rug-cleaning-services/ (service areas)  → CMS "Service areas"
+//   /the-art-of-rug-cleaning-.../ (blog posts)       → src/content/posts
+import Base from '../layouts/Base.astro';
+import RepairPage from '../components/RepairPage.astro';
+import PostPage from '../components/PostPage.astro';
+import AreaPage from '../components/AreaPage.astro';
+import { getOne, getRepair, getSettings, getPosts, mustRead, imageInfo, postImageSrc, type PostEntry } from '../lib/cms';
+import { service, blogPosting } from '../lib/schema';
+
+interface Props {
+  kind: 'repair' | 'post' | 'area';
+  slug: string;
+}
+const { kind, slug } = Astro.props;
+const area = kind === 'area' ? await getOne('areas', slug) : null;
+const areaHero = area ? imageInfo(area.heroImage) : null;
+const s = await getSettings();
+const site = Astro.site!;
+const url = new URL(Astro.url.pathname, site).href;
+const cleaning = await mustRead('cleaning');
+const posts = await getPosts();
+const latestPost = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
+
+const repairPage = kind === 'repair' ? await getRepair(slug) : null;
+const repair = repairPage?.entry ?? null;
+const bodyHtml = repairPage?.bodyHtml ?? '';
+let post: PostEntry | undefined;
+if (kind === 'post') {
+  post = posts.find((p) => p.id === slug);
+}
+
+const cleaningLink = { label: 'Rug cleaning in Louisville', url: '/louisville-rug-cleaning/', text: cleaning.lead };
+const holeRepair = await getOne('repairs', 'hole-or-tear-repair');
+const repairHero = repair ? imageInfo(repair.heroImage) : null;
+---
+
+{
+  kind === 'repair' && repair && (
+    <Base
+      title={repair.seoTitle}
+      description={repair.seoDescription}
+      image={repair.heroImage}
+      imageAlt={repair.heroAlt}
+      crumbs={[{ name: repair.title, url: `/${slug}/` }]}
+      preloadImage={repairHero ? { href: repairHero.fallback, srcset: repairHero.srcset, sizes: '(min-width: 1024px) 50vw, 100vw' } : undefined}
+      jsonLd={[service({ name: repair.title, serviceType: 'Rug repair', description: repair.seoDescription, url, s })]}
+    >
+      <RepairPage
+        slug={slug}
+        entry={repair}
+        bodyHtml={bodyHtml}
+        related={[
+          cleaningLink,
+          ...(latestPost
+            ? [{ label: latestPost.data.title, url: `/${latestPost.id}/`, text: latestPost.data.description.split('. ')[0] + '.' }]
+            : []),
+        ]}
+      />
+    </Base>
+  )
+}
+{
+  kind === 'post' && post && (
+    <Base
+      title={`${post.data.title} | Anabel's`}
+      description={post.data.description.length > 160 ? post.data.description.slice(0, 157).replace(/\s+\S*$/, '') + '…' : post.data.description}
+      image={postImageSrc(post) ? new URL(postImageSrc(post)!, site).href : undefined}
+      imageAlt={post.data.heroAlt}
+      type="article"
+      crumbs={[
+        { name: 'Blog', url: '/blog/' },
+        { name: post.data.title, url: `/${post.id}/` },
+      ]}
+      jsonLd={[
+        blogPosting({
+          title: post.data.title,
+          description: post.data.description,
+          url,
+          image: postImageSrc(post) ? new URL(postImageSrc(post)!, site).href : undefined,
+          date: post.data.pubDate,
+          s,
+        }),
+      ]}
+    >
+      <PostPage
+        post={post}
+        related={[
+          cleaningLink,
+          ...(holeRepair ? [{ label: holeRepair.title, url: '/hole-or-tear-repair/', text: holeRepair.intro }] : []),
+        ]}
+      />
+    </Base>
+  )
+}
+{
+  kind === 'area' && area && (
+    <Base
+      title={area.seoTitle}
+      description={area.seoDescription}
+      image={area.heroImage}
+      imageAlt={area.heroAlt}
+      crumbs={[
+        { name: 'Visit & contact', url: '/contact/' },
+        { name: area.title, url: `/${slug}/` },
+      ]}
+      preloadImage={areaHero ? { href: areaHero.fallback, srcset: areaHero.srcset, sizes: '(min-width: 1024px) 45vw, 100vw' } : undefined}
+      jsonLd={[service({ name: area.title, serviceType: 'Rug cleaning', description: area.seoDescription, url, s })]}
+    >
+      <AreaPage entry={area} />
+    </Base>
+  )
+}

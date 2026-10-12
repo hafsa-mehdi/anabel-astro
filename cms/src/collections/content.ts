@@ -4,12 +4,12 @@ import { altText, heading, image, slug, tabs, text, textList, textarea } from '.
 import { rebuildAfterChange, rebuildAfterDelete } from '../hooks/rebuild'
 import { richTextToHTML } from '../richTextHtml'
 
-// Drafts + version history. Visitors (and the website build) only ever see published entries;
+// Drafts (autosaved while typing, for the live preview) + version history. Visitors (and the website build) only ever see published entries;
 // logged-in editors also see drafts. The site rebuilds when an entry is published or unpublished.
 const shared: Pick<CollectionConfig, 'access' | 'hooks' | 'versions'> = {
   access: { read: ({ req }) => (req.user ? true : { _status: { equals: 'published' } }) },
   hooks: { afterChange: [rebuildAfterChange], afterDelete: [rebuildAfterDelete] },
-  versions: { drafts: true, maxPerDoc: 50 },
+  versions: { drafts: { autosave: { interval: 1500 } }, maxPerDoc: 50 },
 }
 
 /** Rich text plus a read-only HTML copy of it, which is what the Astro site renders. */

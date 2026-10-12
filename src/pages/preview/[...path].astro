@@ -1,0 +1,80 @@
+---
+// CMS live preview: any page of the site, rendered on demand with the latest drafts
+// (src/middleware.ts loads them). Opened by the Payload admin's Live Preview panel.
+import Home from '../../views/Home.astro';
+import Cleaning from '../../views/Cleaning.astro';
+import Contact from '../../views/Contact.astro';
+import Team from '../../views/Team.astro';
+import Tour from '../../views/Tour.astro';
+import Designers from '../../views/Designers.astro';
+import BlogIndex from '../../views/BlogIndex.astro';
+import Slug from '../../views/Slug.astro';
+import { getAll, getPosts, isPreview } from '../../lib/cms';
+
+export const prerender = false;
+
+const path = (Astro.params.path ?? '').replace(/\/$/, '');
+const fixed = { '': Home, 'louisville-rug-cleaning': Cleaning, contact: Contact, team: Team, tour: Tour, 'designer-program': Designers, blog: BlogIndex };
+const View = isPreview() ? fixed[path as keyof typeof fixed] : undefined;
+
+// Repair pages, service areas and blog posts (including ones not published yet)
+let kind: 'repair' | 'area' | 'post' | undefined;
+if (isPreview() && !View && path) {
+  if ((await getAll('repairs')).some((r) => r.slug === path)) kind = 'repair';
+  else if ((await getAll('areas')).some((a) => a.slug === path)) kind = 'area';
+  else if ((await getPosts()).some((p) => p.id === path)) kind = 'post';
+}
+// The admin that embeds this page (its messages are only accepted from there)
+const cmsOrigin = new URL(process.env.PAYLOAD_URL || 'http://localhost:3000').origin;
+if (!View && !kind) return new Response('Nothing to preview at this address yet. Give the entry a page address and save.', { status: 404 });
+---
+
+{View ? <View /> : <Slug kind={kind!} slug={path} />}
+<live-preview data-cms={cmsOrigin} data-stamps={JSON.stringify(Astro.locals.previewStamps ?? {})} hidden></live-preview>
+
+<script>
+  // Reloads when the CMS saves (autosave while typing, Publish), keeping the scroll position.
+  // Also reloads when the form shows a newer version than this page was built from
+  // (e.g. after "Revert to published", which sends no save event).
+  import { isDocumentEvent, isLivePreviewEvent, ready } from '@payloadcms/live-preview';
+
+  const KEY = 'anabels-preview-scroll';
+  const saved = sessionStorage.getItem(KEY);
+  if (saved) {
+    sessionStorage.removeItem(KEY);
+    requestAnimationFrame(() => window.scrollTo(0, Number(saved)));
+  }
+
+  const meta = document.querySelector<HTMLElement>('live-preview');
+  const cmsOrigin = meta?.dataset.cms ?? '';
+  const stamps: Record<string, string> = JSON.parse(meta?.dataset.stamps || '{}');
+  if (cmsOrigin && window.parent !== window) {
+    const reload = () => {
+      sessionStorage.setItem(KEY, String(window.scrollY));
+      window.location.reload();
+    };
+    let pending: number | undefined;
+    window.addEventListener('message', (event) => {
+      if (isDocumentEvent(event, cmsOrigin)) {
+        clearTimeout(pending);
+        reload();
+      } else if (isLivePreviewEvent(event, cmsOrigin)) {
+        const { globalSlug, collectionSlug, data } = event.data as {
+          globalSlug?: string;
+          collectionSlug?: string;
+          data?: { id?: string | number; updatedAt?: string };
+        };
+        const key = globalSlug ?? `${collectionSlug}:${data?.id}`;
+        const shown = stamps[key];
+        const latest = data?.updatedAt;
+        // Reload once per newer version (never loops: the reloaded page carries the new stamp)
+        if (shown && latest && Date.parse(latest) > Date.parse(shown) && sessionStorage.getItem(`${KEY}:${key}`) !== latest) {
+          sessionStorage.setItem(`${KEY}:${key}`, latest);
+          clearTimeout(pending);
+          pending = window.setTimeout(reload, 300);
+        }
+      }
+    });
+    ready({ serverURL: cmsOrigin });
+  }
+</script>

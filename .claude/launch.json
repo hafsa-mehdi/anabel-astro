@@ -4,13 +4,30 @@
     {
       "name": "cms",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "cms", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "cms",
+        "run",
+        "dev"
+      ],
       "port": 3000
     },
     {
       "name": "site",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "site-payload",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:payload"
+      ],
       "port": 4321
     }
   ]
