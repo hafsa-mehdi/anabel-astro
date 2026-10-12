@@ -1,5 +1,17 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  BlockquoteFeature,
+  BoldFeature,
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineToolbarFeature,
+  ItalicFeature,
+  LinkFeature,
+  OrderedListFeature,
+  ParagraphFeature,
+  UnorderedListFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -19,13 +31,33 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     meta: { titleSuffix: " · Anabel's CMS" },
+    // The website is dark, so the editor is too
+    theme: 'dark',
+    components: {
+      graphics: { Logo: '/components/Logo#Logo', Icon: '/components/Icon#Icon' },
+      actions: ['/components/ViewSite#ViewSite'],
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
   collections: [Repairs, Areas, Posts, Testimonials, Media, Users],
   globals: [...pageGlobals, Settings],
-  editor: lexicalEditor(),
+  // Only what the website's text styles support: H2/H3, bold, italic, lists, quotes, links.
+  editor: lexicalEditor({
+    features: () => [
+      ParagraphFeature(),
+      HeadingFeature({ enabledHeadingSizes: ['h2', 'h3'] }),
+      BoldFeature(),
+      ItalicFeature(),
+      UnorderedListFeature(),
+      OrderedListFeature(),
+      BlockquoteFeature(),
+      LinkFeature({ enabledCollections: [] }),
+      FixedToolbarFeature(),
+      InlineToolbarFeature(),
+    ],
+  }),
   secret: process.env.PAYLOAD_SECRET || '',
   // The Astro site (any origin) reads the public content over the REST API at build time.
   cors: '*',

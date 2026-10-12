@@ -1,0 +1,113 @@
+// Anabel's branding for the Payload admin: the website's "Dark gallery" colours and wordmark.
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/cormorant-600-italic.woff2') format('woff2');
+}
+
+@layer payload-default {
+  :root {
+    --anabels-gold: #d4a24c;
+    --anabels-madder: #a33a2e;
+    --anabels-serif: 'Cormorant Garamond', Georgia, serif;
+  }
+
+  html[data-theme='dark'] {
+  --theme-elevation-0: #16120f;
+  --theme-elevation-50: #1d1916;
+  --theme-elevation-100: #26221e;
+  --theme-elevation-150: #2f2b27;
+  --theme-elevation-200: #393430;
+  --theme-elevation-250: #433e3a;
+  --theme-elevation-300: #4d4944;
+  --theme-elevation-350: #58534e;
+  --theme-elevation-400: #635e59;
+  --theme-elevation-450: #6e6963;
+  --theme-elevation-500: #7a756e;
+  --theme-elevation-550: #858079;
+  --theme-elevation-600: #918c84;
+  --theme-elevation-650: #9d9790;
+  --theme-elevation-700: #a9a39b;
+  --theme-elevation-750: #b5afa7;
+  --theme-elevation-800: #c1bbb2;
+  --theme-elevation-850: #cdc8be;
+  --theme-elevation-900: #dad4ca;
+  --theme-elevation-950: #e6e0d6;
+  --theme-elevation-1000: #f3ede2;
+    --theme-bg: var(--theme-elevation-0);
+    --theme-input-bg: var(--theme-elevation-50);
+    --theme-text: var(--theme-elevation-1000);
+  }
+}
+
+// Wordmark on the login screen
+.anabels-logo {
+  display: grid;
+  justify-items: center;
+  line-height: 1;
+  color: var(--theme-text);
+}
+.anabels-logo__name {
+  font-family: var(--anabels-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 3.2rem;
+  letter-spacing: -0.01em;
+}
+.anabels-logo__tag {
+  margin-top: 0.45rem;
+  padding-left: 0.42em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--anabels-gold);
+}
+.anabels-logo__sub {
+  margin-top: 1.4rem;
+  font-size: 0.85rem;
+  color: var(--theme-elevation-600);
+}
+
+// Mark in the top bar
+.anabels-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  border: 1px solid var(--anabels-gold);
+  color: var(--anabels-gold);
+  font-family: var(--anabels-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+// "View website" in the top bar
+.anabels-view-site {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--theme-elevation-200);
+  color: var(--theme-text);
+  font-size: 0.8rem;
+  text-decoration: none;
+  white-space: nowrap;
+  &:hover {
+    border-color: var(--anabels-gold);
+    color: var(--anabels-gold);
+  }
+}
+
+// Primary buttons (Publish, Save) in the site's red
+.btn--style-primary:not(.btn--disabled) {
+  --bg-color: var(--anabels-madder);
+  --color: #fff;
+  --hover-bg: #86291f;
+  --hover-color: #fff;
+}

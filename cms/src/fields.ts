@@ -1,6 +1,7 @@
 // Shared field builders, mirroring the helpers at the top of ../keystatic.config.ts so both
 // admin panels ask for the same content with the same names (the Astro site reads either).
-import type { ArrayField, Field, GroupField, SelectField, TextField, TextareaField, UploadField } from 'payload'
+import { slugField } from 'payload'
+import type { ArrayField, Field, GroupField, RowField, SelectField, TabsField, TextField, TextareaField, UploadField } from 'payload'
 
 export const accentHelp = 'Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.'
 
@@ -25,12 +26,36 @@ export const image = (name: string, label: string, description?: string): Upload
   admin: { description },
 })
 
-export const altText = (name: string, what = 'the image') =>
-  text(
+/**
+ * Alt text for the photo next to it (heroAlt → heroImage, imageAlt → image, photoAlt → photo).
+ * Required as soon as a photo is chosen; checked on save only, so the database is unchanged.
+ */
+export const altText = (name: string, what = 'the image'): TextField => {
+  const base = name.replace(/Alt$/, '')
+  return text(
     name,
     'Image description (alt text)',
     `Describe ${what} in one plain sentence for visitors who use screen readers and for Google. Example: "Blue and ivory rug in a sunlit living room".`,
+    {
+      validate: (value: unknown, { siblingData }: { siblingData: Record<string, unknown> }) => {
+        const photo = siblingData?.[base] ?? siblingData?.[`${base}Image`]
+        if (photo && !(typeof value === 'string' && value.trim())) return `Please describe ${what}: it is required when a photo is chosen.`
+        return true
+      },
+    } as Partial<TextField>,
   )
+}
+
+/** Shows a list item by one of its fields ("Rug Cleaning") instead of "Card 01". */
+export const rowLabel = (field: string, fallback: string) => ({
+  components: { RowLabel: { path: '/components/RowLabel#RowLabel', clientProps: { field, fallback } } },
+})
+
+/** Splits a long page into tabs. Tabs without a name only change the screen, not the stored data. */
+export const tabs = (...list: [label: string, fields: Field[]][]): TabsField => ({
+  type: 'tabs',
+  tabs: list.map(([label, fields]) => ({ label, fields })),
+})
 
 export const link = (name: string, label: string, description?: string): GroupField => ({
   name,
@@ -52,11 +77,12 @@ export const link = (name: string, label: string, description?: string): GroupFi
   ],
 })
 
-export const linkList = (name: string, label: string, description?: string): ArrayField => ({
+export const linkList = (name: string, label: string, description?: string, itemLabel = 'Link'): ArrayField => ({
   name,
   label,
   type: 'array',
-  admin: { description },
+  labels: { singular: itemLabel, plural: label },
+  admin: { description, ...rowLabel('label', itemLabel) },
   fields: [
     {
       type: 'row',
@@ -74,7 +100,7 @@ export const textList = (name: string, label: string, itemLabel: string, descrip
   label,
   type: 'array',
   labels: { singular: itemLabel, plural: label },
-  admin: { description },
+  admin: { description, ...rowLabel('value', itemLabel) },
   fields: [multiline ? textarea('value', itemLabel) : text('value', itemLabel)],
 })
 
@@ -111,16 +137,22 @@ export const imagePosition: SelectField = {
   ],
 }
 
-/** Page address field, like Keystatic's fields.slug. */
-export const slug = (description: string): TextField => ({
-  name: 'slug',
-  label: 'Page address',
-  type: 'text',
-  required: true,
-  unique: true,
-  index: true,
-  admin: { position: 'sidebar', description },
-})
+/**
+ * Page address, filled in from the title ("Fringe Repair" → fringe-repair) until it is first
+ * saved; after that it only changes when an editor unlocks and edits it, so live URLs stay put.
+ */
+export const slug = (description: string): RowField =>
+  slugField({
+    useAsSlug: 'title',
+    overrides: (row) => ({
+      ...row,
+      fields: row.fields.map((f) =>
+        'name' in f && f.name === 'slug'
+          ? ({ ...f, label: 'Page address', admin: { ...f.admin, description } } as Field)
+          : f,
+      ),
+    }),
+  }) as RowField
 
 export const group = (name: string, label: string, fields: Field[], description?: string): GroupField => ({
   name,

@@ -23,7 +23,7 @@ const ASSET_DIR = path.join(ROOT, 'src', 'generated', 'payload-assets');
 const GLOBALS = ['settings', 'home', 'cleaning', 'visit', 'team', 'tour', 'designers', 'blog'];
 const COLLECTIONS = ['repairs', 'areas', 'posts', 'testimonials'];
 // Payload-only fields the site does not use
-const DROP = new Set(['id', 'createdAt', 'updatedAt', 'globalType']);
+const DROP = new Set(['id', 'createdAt', 'updatedAt', 'globalType', '_status', 'generateSlug']);
 // Rich text JSON (Lexical); the site uses the HTML copy Payload adds next to it (bodyHtml, contentHtml)
 const isRichText = (v) => v && typeof v === 'object' && v.root && typeof v.root === 'object';
 

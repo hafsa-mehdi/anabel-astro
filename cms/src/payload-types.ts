@@ -154,17 +154,13 @@ export interface Repair {
    */
   title: string;
   /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  /**
    * The end of the URL. Keep it identical to the old WordPress page, e.g. fringe-repair
    */
   slug: string;
-  /**
-   * Shown in Google results and the browser tab. Aim for 50–60 characters.
-   */
-  seoTitle?: string | null;
-  /**
-   * Aim for 140–160 characters.
-   */
-  seoDescription?: string | null;
   heroImage?: (number | null) | Media;
   /**
    * Describe the top photo in one plain sentence for visitors who use screen readers and for Google. Example: "Blue and ivory rug in a sunlit living room".
@@ -206,8 +202,17 @@ export interface Repair {
    */
   ctaHeading?: string | null;
   ctaText?: string | null;
+  /**
+   * Shown in Google results and the browser tab. Aim for 50–60 characters.
+   */
+  seoTitle?: string | null;
+  /**
+   * Aim for 140–160 characters.
+   */
+  seoDescription?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -244,11 +249,13 @@ export interface Area {
    */
   title: string;
   /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  /**
    * Keep identical to the old page, e.g. indiana-rug-cleaning-services
    */
   slug: string;
-  seoTitle?: string | null;
-  seoDescription?: string | null;
   kicker?: string | null;
   /**
    * Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.
@@ -272,8 +279,11 @@ export interface Area {
     | null;
   formHeading?: string | null;
   formIntro?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -283,14 +293,18 @@ export interface Post {
   id: number;
   title: string;
   /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  /**
    * The end of the URL. Do not change it after publishing.
    */
   slug: string;
+  pubDate: string;
   /**
    * Shown on the blog listing and in Google results. Two sentences at most.
    */
   description?: string | null;
-  pubDate: string;
   /**
    * Shown on the post and the blog listing.
    */
@@ -317,6 +331,7 @@ export interface Post {
   contentHtml?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -340,6 +355,7 @@ export interface Testimonial {
   date?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -463,9 +479,8 @@ export interface PayloadMigration {
  */
 export interface RepairsSelect<T extends boolean = true> {
   title?: T;
+  generateSlug?: T;
   slug?: T;
-  seoTitle?: T;
-  seoDescription?: T;
   heroImage?: T;
   heroAlt?: T;
   intro?: T;
@@ -481,8 +496,11 @@ export interface RepairsSelect<T extends boolean = true> {
   formIntro?: T;
   ctaHeading?: T;
   ctaText?: T;
+  seoTitle?: T;
+  seoDescription?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -490,9 +508,8 @@ export interface RepairsSelect<T extends boolean = true> {
  */
 export interface AreasSelect<T extends boolean = true> {
   title?: T;
+  generateSlug?: T;
   slug?: T;
-  seoTitle?: T;
-  seoDescription?: T;
   kicker?: T;
   heading?: T;
   intro?: T;
@@ -507,8 +524,11 @@ export interface AreasSelect<T extends boolean = true> {
       };
   formHeading?: T;
   formIntro?: T;
+  seoTitle?: T;
+  seoDescription?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -516,15 +536,17 @@ export interface AreasSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
+  generateSlug?: T;
   slug?: T;
-  description?: T;
   pubDate?: T;
+  description?: T;
   heroImage?: T;
   heroAlt?: T;
   content?: T;
   contentHtml?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -538,6 +560,7 @@ export interface TestimonialsSelect<T extends boolean = true> {
   date?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -628,16 +651,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Home {
   id: number;
-  seo?: {
-    /**
-     * The title shown in Google results and the browser tab for the homepage. Aim for 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * The short summary under the title in Google results. Aim for 140–160 characters.
-     */
-    description?: string | null;
-  };
   /**
    * The 3D rug under the buttons is drawn automatically and is not edited here.
    */
@@ -780,6 +793,17 @@ export interface Home {
     heading?: string | null;
     intro?: string | null;
   };
+  seo?: {
+    /**
+     * The title shown in Google results and the browser tab for the homepage. Aim for 50–60 characters.
+     */
+    title?: string | null;
+    /**
+     * The short summary under the title in Google results. Aim for 140–160 characters.
+     */
+    description?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -789,16 +813,6 @@ export interface Home {
  */
 export interface Cleaning {
   id: number;
-  seo?: {
-    /**
-     * The title shown in Google results and the browser tab for the Rug Cleaning page. Aim for 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * The short summary under the title in Google results. Aim for 140–160 characters.
-     */
-    description?: string | null;
-  };
   heroImage?: (number | null) | Media;
   /**
    * Describe the top photo in one plain sentence for visitors who use screen readers and for Google. Example: "Blue and ivory rug in a sunlit living room".
@@ -859,6 +873,17 @@ export interface Cleaning {
     heading?: string | null;
     body?: string | null;
   };
+  seo?: {
+    /**
+     * The title shown in Google results and the browser tab for the Rug Cleaning page. Aim for 50–60 characters.
+     */
+    title?: string | null;
+    /**
+     * The short summary under the title in Google results. Aim for 140–160 characters.
+     */
+    description?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -868,16 +893,6 @@ export interface Cleaning {
  */
 export interface Visit {
   id: number;
-  seo?: {
-    /**
-     * The title shown in Google results and the browser tab for the Visit / Contact page. Aim for 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * The short summary under the title in Google results. Aim for 140–160 characters.
-     */
-    description?: string | null;
-  };
   kicker?: string | null;
   /**
    * Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.
@@ -903,6 +918,17 @@ export interface Visit {
     heading?: string | null;
     intro?: string | null;
   };
+  seo?: {
+    /**
+     * The title shown in Google results and the browser tab for the Visit / Contact page. Aim for 50–60 characters.
+     */
+    title?: string | null;
+    /**
+     * The short summary under the title in Google results. Aim for 140–160 characters.
+     */
+    description?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -912,16 +938,6 @@ export interface Visit {
  */
 export interface Team {
   id: number;
-  seo?: {
-    /**
-     * The title shown in Google results and the browser tab for the Team page. Aim for 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * The short summary under the title in Google results. Aim for 140–160 characters.
-     */
-    description?: string | null;
-  };
   kicker?: string | null;
   /**
    * Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.
@@ -961,6 +977,17 @@ export interface Team {
         id?: string | null;
       }[]
     | null;
+  seo?: {
+    /**
+     * The title shown in Google results and the browser tab for the Team page. Aim for 50–60 characters.
+     */
+    title?: string | null;
+    /**
+     * The short summary under the title in Google results. Aim for 140–160 characters.
+     */
+    description?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -970,16 +997,6 @@ export interface Team {
  */
 export interface Tour {
   id: number;
-  seo?: {
-    /**
-     * The title shown in Google results and the browser tab for the Tour page. Aim for 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * The short summary under the title in Google results. Aim for 140–160 characters.
-     */
-    description?: string | null;
-  };
   kicker?: string | null;
   /**
    * Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.
@@ -998,6 +1015,17 @@ export interface Tour {
    * Describe the photo in one plain sentence for visitors who use screen readers and for Google. Example: "Blue and ivory rug in a sunlit living room".
    */
   imageAlt?: string | null;
+  seo?: {
+    /**
+     * The title shown in Google results and the browser tab for the Tour page. Aim for 50–60 characters.
+     */
+    title?: string | null;
+    /**
+     * The short summary under the title in Google results. Aim for 140–160 characters.
+     */
+    description?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1007,16 +1035,6 @@ export interface Tour {
  */
 export interface Designer {
   id: number;
-  seo?: {
-    /**
-     * The title shown in Google results and the browser tab for the Designer program page. Aim for 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * The short summary under the title in Google results. Aim for 140–160 characters.
-     */
-    description?: string | null;
-  };
   kicker?: string | null;
   /**
    * Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.
@@ -1054,6 +1072,17 @@ export interface Designer {
     intro?: string | null;
     documentsHelp?: string | null;
   };
+  seo?: {
+    /**
+     * The title shown in Google results and the browser tab for the Designer program page. Aim for 50–60 characters.
+     */
+    title?: string | null;
+    /**
+     * The short summary under the title in Google results. Aim for 140–160 characters.
+     */
+    description?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1063,6 +1092,11 @@ export interface Designer {
  */
 export interface Blog {
   id: number;
+  /**
+   * Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.
+   */
+  heading?: string | null;
+  intro?: string | null;
   seo?: {
     /**
      * The title shown in Google results and the browser tab for the blog listing page. Aim for 50–60 characters.
@@ -1073,11 +1107,7 @@ export interface Blog {
      */
     description?: string | null;
   };
-  /**
-   * Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.
-   */
-  heading?: string | null;
-  intro?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1105,7 +1135,7 @@ export interface Setting {
     tagline?: string | null;
   };
   /**
-   * Used by Google and when pages are shared on social media. The header shows the name below instead.
+   * Used by Google and when pages are shared on social media. The header shows the name above instead.
    */
   logo?: (number | null) | Media;
   /**
@@ -1125,6 +1155,43 @@ export interface Setting {
     region?: string | null;
     postalCode?: string | null;
   };
+  /**
+   * One short line about the business under the logo in the footer.
+   */
+  footerNote?: string | null;
+  /**
+   * One line per group of days with the same hours.
+   */
+  hours?:
+    | {
+        /**
+         * e.g. Monday – Friday
+         */
+        label?: string | null;
+        /**
+         * Used for the opening hours Google shows. Pick every day this line applies to.
+         */
+        days?: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday')[] | null;
+        closed?: boolean | null;
+        /**
+         * e.g. 10:00
+         */
+        opens?: string | null;
+        /**
+         * e.g. 17:30 for 5:30 PM
+         */
+        closes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The Google Maps link that opens when someone taps "Get directions".
+   */
+  directionsUrl?: string | null;
+  /**
+   * What the embedded map on the Visit page searches for. The business name plus address is the safest choice.
+   */
+  mapQuery?: string | null;
   geo?: {
     /**
      * Only used by Google. Change it only if the showroom moves.
@@ -1143,63 +1210,6 @@ export interface Setting {
         id?: string | null;
       }[]
     | null;
-  /**
-   * The Google Maps link that opens when someone taps "Get directions".
-   */
-  directionsUrl?: string | null;
-  /**
-   * What the embedded map on the Visit page searches for. The business name plus address is the safest choice.
-   */
-  mapQuery?: string | null;
-  /**
-   * One line per group of days with the same hours.
-   */
-  hours?:
-    | {
-        /**
-         * e.g. Monday – Friday
-         */
-        label?: string | null;
-        /**
-         * Used for the opening hours Google shows. Pick every day this line applies to.
-         */
-        days?: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday')[] | null;
-        closed?: boolean | null;
-        /**
-         * e.g. 10:00. Leave empty if closed.
-         */
-        opens?: string | null;
-        /**
-         * e.g. 17:30 for 5:30 PM. Leave empty if closed.
-         */
-        closes?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  social?:
-    | {
-        platform?: ('Facebook' | 'Instagram' | 'Pinterest' | 'YouTube') | null;
-        url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Shown on the Visit page and in the footer.
-   */
-  serviceAreas?:
-    | {
-        label?: string | null;
-        /**
-         * Starts with "/" for a page on this site, https:// for other websites.
-         */
-        url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Used by "Browse rugs" buttons.
-   */
-  shopUrl?: string | null;
   /**
    * The red button that stays in the header on every page (and in the bar at the bottom of phones).
    */
@@ -1237,13 +1247,34 @@ export interface Setting {
       }[]
     | null;
   /**
-   * One short line about the business under the logo in the footer.
+   * Used by "Browse rugs" buttons.
    */
-  footerNote?: string | null;
+  shopUrl?: string | null;
+  /**
+   * Shown on the Visit page and in the footer.
+   */
+  serviceAreas?:
+    | {
+        label?: string | null;
+        /**
+         * Starts with "/" for a page on this site, https:// for other websites.
+         */
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  social?:
+    | {
+        platform?: ('Facebook' | 'Instagram' | 'Pinterest' | 'YouTube') | null;
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Where booking forms are sent, for example an n8n webhook URL. Leave empty while testing: the form will then tell visitors it is not connected yet and show the phone number.
    */
   formEndpoint?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1252,12 +1283,6 @@ export interface Setting {
  * via the `definition` "home_select".
  */
 export interface HomeSelect<T extends boolean = true> {
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   hero?:
     | T
     | {
@@ -1359,6 +1384,13 @@ export interface HomeSelect<T extends boolean = true> {
         heading?: T;
         intro?: T;
       };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1368,12 +1400,6 @@ export interface HomeSelect<T extends boolean = true> {
  * via the `definition` "cleaning_select".
  */
 export interface CleaningSelect<T extends boolean = true> {
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   heroImage?: T;
   heroAlt?: T;
   kicker?: T;
@@ -1418,6 +1444,13 @@ export interface CleaningSelect<T extends boolean = true> {
         heading?: T;
         body?: T;
       };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1427,12 +1460,6 @@ export interface CleaningSelect<T extends boolean = true> {
  * via the `definition` "visit_select".
  */
 export interface VisitSelect<T extends boolean = true> {
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   kicker?: T;
   heading?: T;
   intro?: T;
@@ -1448,6 +1475,13 @@ export interface VisitSelect<T extends boolean = true> {
         heading?: T;
         intro?: T;
       };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1457,12 +1491,6 @@ export interface VisitSelect<T extends boolean = true> {
  * via the `definition` "team_select".
  */
 export interface TeamSelect<T extends boolean = true> {
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   kicker?: T;
   heading?: T;
   story?:
@@ -1483,6 +1511,13 @@ export interface TeamSelect<T extends boolean = true> {
         photoAlt?: T;
         id?: T;
       };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1492,18 +1527,19 @@ export interface TeamSelect<T extends boolean = true> {
  * via the `definition` "tour_select".
  */
 export interface TourSelect<T extends boolean = true> {
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   kicker?: T;
   heading?: T;
   intro?: T;
   tourUrl?: T;
   image?: T;
   imageAlt?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1513,12 +1549,6 @@ export interface TourSelect<T extends boolean = true> {
  * via the `definition` "designers_select".
  */
 export interface DesignersSelect<T extends boolean = true> {
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   kicker?: T;
   heading?: T;
   intro?: T;
@@ -1540,6 +1570,13 @@ export interface DesignersSelect<T extends boolean = true> {
         intro?: T;
         documentsHelp?: T;
       };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1549,14 +1586,15 @@ export interface DesignersSelect<T extends boolean = true> {
  * via the `definition` "blog_select".
  */
 export interface BlogSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
   seo?:
     | T
     | {
         title?: T;
         description?: T;
       };
-  heading?: T;
-  intro?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1584,6 +1622,19 @@ export interface SettingsSelect<T extends boolean = true> {
         region?: T;
         postalCode?: T;
       };
+  footerNote?: T;
+  hours?:
+    | T
+    | {
+        label?: T;
+        days?: T;
+        closed?: T;
+        opens?: T;
+        closes?: T;
+        id?: T;
+      };
+  directionsUrl?: T;
+  mapQuery?: T;
   geo?:
     | T
     | {
@@ -1598,33 +1649,6 @@ export interface SettingsSelect<T extends boolean = true> {
         longitude?: T;
         id?: T;
       };
-  directionsUrl?: T;
-  mapQuery?: T;
-  hours?:
-    | T
-    | {
-        label?: T;
-        days?: T;
-        closed?: T;
-        opens?: T;
-        closes?: T;
-        id?: T;
-      };
-  social?:
-    | T
-    | {
-        platform?: T;
-        url?: T;
-        id?: T;
-      };
-  serviceAreas?:
-    | T
-    | {
-        label?: T;
-        url?: T;
-        id?: T;
-      };
-  shopUrl?: T;
   headerCta?:
     | T
     | {
@@ -1645,8 +1669,23 @@ export interface SettingsSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  footerNote?: T;
+  shopUrl?: T;
+  serviceAreas?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  social?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
   formEndpoint?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

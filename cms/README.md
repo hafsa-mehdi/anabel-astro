@@ -63,6 +63,20 @@ Two Vercel projects from the same GitHub repository:
 Optional: CMS project > Settings > Git > Ignored Build Step:
 `git diff --quiet HEAD^ HEAD -- .` so site-only commits do not rebuild the CMS.
 
+## Editing (what editors get)
+
+- **Drafts:** "Save Draft" keeps a change private; "Publish changes" puts it live and rebuilds
+  the site. Every page has a version history (Versions tab) with "Revert to published".
+- **Tabs** on long pages (Homepage, Site settings, Cleaning page; Content / SEO elsewhere).
+- **List items named by their content** ("Rug cleaning", not "Card 01").
+- **Page address** fills itself in from the title on the first save, then stays locked
+  (Unlock to change it on purpose, since that changes a live URL).
+- **Text editor** limited to what the site styles: paragraphs, H2/H3, bold, italic, lists,
+  quotes, links.
+- **Alt text** is required as soon as a photo is chosen (checked on Publish).
+- **Branding:** Anabel's wordmark and the site's dark colours; "View website" in the top bar
+  (`SITE_URL`, defaults to the Payload version of the site).
+
 ## Changing fields
 
 Edit `src/globals` or `src/collections` (keep the field names in step with `keystatic.config.ts`
