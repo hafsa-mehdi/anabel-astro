@@ -46,8 +46,11 @@ try {
 
 const manifest = {};
 let made = 0;
+// Photos downloaded from the Payload test CMS only count when the site reads Payload
+const skipPayload = process.env.CMS !== 'payload';
 for (const file of await walk(UPLOADS)) {
   const rel = path.relative(UPLOADS, file).split(path.sep).join('/');
+  if (skipPayload && rel.startsWith('_payload/')) continue;
   const publicSrc = `/images/uploads/${rel}`;
   const srcStat = await stat(file);
   const meta = await sharp(file).metadata();

@@ -5,7 +5,7 @@ import Icon from '../components/Icon.astro';
 import BookingForm from '../components/BookingForm.astro';
 import SmartLink from '../components/SmartLink.astro';
 import ShowroomMap from '../components/ShowroomMap.astro';
-import { getSettings, mustRead, telHref, addressLines, absoluteImage, accent, imageInfo, reader } from '../lib/cms';
+import { getSettings, mustRead, telHref, addressLines, absoluteImage, accent, imageInfo, getAll } from '../lib/cms';
 import { localBusiness } from '../lib/schema';
 
 const s = await getSettings();
@@ -13,8 +13,8 @@ const page = await mustRead('visit');
 const site = Astro.site!;
 const photo = imageInfo(page.image);
 const photoSizes = '(min-width: 1024px) 40vw, 100vw';
-// Service-area cards: photo and towns come from Keystatic → Service areas
-const areaEntries = await reader.collections.areas.all();
+// Service-area cards: photo and towns come from the CMS → Service areas
+const areaEntries = await getAll('areas');
 const areaCards = s.serviceAreas.map((a) => {
   const e = areaEntries.find((x) => a.url.replace(/\//g, '') === x.slug);
   return { ...a, image: e?.entry.heroImage, alt: e?.entry.heroAlt ?? '', towns: e?.entry.cities ?? [] };

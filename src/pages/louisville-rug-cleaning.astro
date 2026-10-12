@@ -6,7 +6,7 @@ import BookingForm from '../components/BookingForm.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import VisitStrip from '../components/VisitStrip.astro';
 import { getCollection } from 'astro:content';
-import { getSettings, mustRead, paragraphs, telHref, imageInfo, reader, accent } from '../lib/cms';
+import { getSettings, mustRead, paragraphs, telHref, imageInfo, getOne, accent } from '../lib/cms';
 import { service } from '../lib/schema';
 
 const s = await getSettings();
@@ -15,7 +15,7 @@ const home = await mustRead('home');
 const site = Astro.site!;
 const url = new URL(Astro.url.pathname, site).href;
 
-const repair = await reader.collections.repairs.read('hole-or-tear-repair');
+const repair = await getOne('repairs', 'hole-or-tear-repair');
 const post = (await getCollection('posts')).find((p) => p.id === 'the-art-of-rug-cleaning-why-professional-care-matters');
 const related = [
   repair && { label: repair.title, url: '/hole-or-tear-repair/', text: repair.intro },
