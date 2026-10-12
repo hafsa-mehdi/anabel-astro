@@ -199,3 +199,12 @@ Tips
   "Also from Anabel's", "Rug repair") are written in the components.
 - Map tiles come from OpenFreeMap (free, community-run). For a busy
   production site consider a paid tile plan.
+
+
+8. PAYLOAD CMS TEST (cms/ folder)
+---------------------------------
+A second admin panel, Payload 3, is being tested next to Keystatic. It has the
+same pages and fields, its own database, and was filled with a copy of the
+Keystatic content. The website reads Payload only when CMS=payload is set;
+without it nothing changes. Everything about it (running it locally, putting
+it on Vercel as two extra projects) is in cms/README.md.

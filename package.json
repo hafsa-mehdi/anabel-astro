@@ -7,10 +7,11 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "images": "node scripts/optimize-uploads.mjs",
-    "predev": "node scripts/optimize-uploads.mjs",
+    "cms:sync": "node --env-file-if-exists=.env scripts/payload-sync.mjs",
+    "images": "node --env-file-if-exists=.env scripts/optimize-uploads.mjs",
+    "predev": "npm run cms:sync && npm run images",
     "dev": "astro dev",
-    "prebuild": "node scripts/optimize-uploads.mjs",
+    "prebuild": "npm run cms:sync && npm run images",
     "build": "astro build",
     "postbuild": "node scripts/vercel-routes.mjs",
     "astro": "astro"

@@ -7,6 +7,7 @@
 - Design: "Dark gallery" (global.css tokens). Headings support *accent* via accent() in lib/cms.ts.
 - Motion: Lenis + reveal observer in Base.astro; CleaningSteps.astro (rug unrolls once when in view); ShowroomMap.astro (MapLibre 6 + OpenFreeMap, lazy).
 - Vercel: vercel.json; builds on Vercel are noindex unless SITE_INDEXING=true.
+- Payload test: cms/ is a separate Next.js + Payload 3 app (Postgres in Docker locally, Neon + Vercel Blob online), same schema/field names as keystatic.config.ts. CMS=payload makes scripts/payload-sync.mjs download content + photos (git-ignored) and src/lib/cms.ts read them; pages must read content only through cms.ts helpers (readSingleton/mustRead/getAll/getOne/getRepair), never the Keystatic reader directly. See cms/README.md.
 - 3D hero: src/components/RugHero.astro + src/scripts/rug3d.ts (three.js, dynamic import, desktop only). Posters in public/images/hero/ were rendered from the same scene.
 
 ## Development

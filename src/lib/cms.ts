@@ -1,26 +1,79 @@
-// Reads content saved by Keystatic and offers small helpers for the pages.
+// Reads the site content and offers small helpers for the pages.
+//
+// Two content sources, same shape (Keystatic's types are the reference):
+//   - Keystatic (default): the files in src/content/
+//   - Payload (CMS=payload): src/generated/payload-content.json, downloaded from the Payload
+//     CMS in cms/ by scripts/payload-sync.mjs before every dev/build run.
+import fs from 'node:fs';
+import path from 'node:path';
 import { createReader } from '@keystatic/core/reader';
 import Markdoc from '@markdoc/markdoc';
 import keystaticConfig from '../../keystatic.config';
 import manifest from '../generated/image-manifest.json';
 
-export const reader = createReader(process.cwd(), keystaticConfig);
+export const usePayload = (import.meta.env.CMS ?? process.env.CMS) === 'payload';
+
+const reader = createReader(process.cwd(), keystaticConfig);
+type Reader = typeof reader;
+type SingletonKey = keyof Reader['singletons'];
+type CollectionKey = keyof Reader['collections'];
+type SingletonData<K extends SingletonKey> = NonNullable<Awaited<ReturnType<Reader['singletons'][K]['read']>>>;
+type CollectionData<K extends CollectionKey> = NonNullable<Awaited<ReturnType<Reader['collections'][K]['read']>>>;
+
+let payloadCache: Record<string, any> | undefined;
+function payloadContent() {
+  // In dev, reread on every request so "npm run cms:sync" shows new edits without a restart
+  if (!payloadCache || import.meta.env.DEV) {
+    const file = path.join(process.cwd(), 'src', 'generated', 'payload-content.json');
+    if (!fs.existsSync(file)) throw new Error('CMS=payload but src/generated/payload-content.json is missing. Run "npm run dev" or "npm run build" so scripts/payload-sync.mjs downloads it.');
+    payloadCache = JSON.parse(fs.readFileSync(file, 'utf8'));
+  }
+  return payloadCache!;
+}
+
+/** One-off page content (home, cleaning, …, settings), or null when it was never saved. */
+export async function readSingleton<K extends SingletonKey>(key: K): Promise<SingletonData<K> | null> {
+  if (usePayload) return (payloadContent()[key] as SingletonData<K>) ?? null;
+  return (await reader.singletons[key].read()) as SingletonData<K> | null;
+}
+
+/** All entries of a collection as { slug, entry }. Rich text is not included (see getRepair). */
+export async function getAll<K extends Exclude<CollectionKey, 'posts'>>(key: K): Promise<{ slug: string; entry: CollectionData<K> }[]> {
+  if (usePayload) return payloadContent()[key];
+  return (await reader.collections[key].all()) as { slug: string; entry: CollectionData<K> }[];
+}
+
+export async function getOne<K extends Exclude<CollectionKey, 'posts'>>(key: K, slug: string): Promise<CollectionData<K> | null> {
+  if (usePayload) return payloadContent()[key].find((e: { slug: string }) => e.slug === slug)?.entry ?? null;
+  return (await reader.collections[key].read(slug)) as CollectionData<K> | null;
+}
+
+/** A repair page with its main text rendered to HTML. */
+export async function getRepair(slug: string) {
+  if (usePayload) {
+    const entry = await getOne('repairs', slug);
+    // <article> wrapper: same markup as Markdoc's renderer below
+    return entry ? { entry, bodyHtml: `<article>${(entry as unknown as { bodyHtml?: string }).bodyHtml ?? ''}</article>` } : null;
+  }
+  const entry = await reader.collections.repairs.read(slug, { resolveLinkedFiles: true });
+  return entry ? { entry: entry as unknown as CollectionData<'repairs'>, bodyHtml: await markdocToHtml(entry.body as any) } : null;
+}
 
 export async function getSettings() {
-  const s = await reader.singletons.settings.read();
-  if (!s) throw new Error('Site settings are missing: open Keystatic → Site-wide → Site settings and save.');
+  const s = await readSingleton('settings');
+  if (!s) throw new Error('Site settings are missing: open the CMS → Site-wide → Site settings and save.');
   return s;
 }
 export type Settings = Awaited<ReturnType<typeof getSettings>>;
 
-export async function mustRead<K extends 'home' | 'cleaning' | 'visit' | 'blog' | 'team' | 'tour' | 'designers'>(key: K) {
-  const entry = await reader.singletons[key].read();
-  if (!entry) throw new Error(`The "${key}" page content is missing. Open it in Keystatic and save once.`);
-  return entry as NonNullable<Awaited<ReturnType<(typeof reader.singletons)[K]['read']>>>;
+export async function mustRead<K extends Exclude<SingletonKey, 'settings'>>(key: K) {
+  const entry = await readSingleton(key);
+  if (!entry) throw new Error(`The "${key}" page content is missing. Open it in the CMS and save once.`);
+  return entry;
 }
 
 export async function getTestimonials() {
-  const all = await reader.collections.testimonials.all();
+  const all = await getAll('testimonials');
   return all.filter((t) => t.entry.quote?.trim());
 }
 

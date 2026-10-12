@@ -5,6 +5,7 @@ import markdoc from '@astrojs/markdoc';
 import sitemap from '@astrojs/sitemap';
 import keystatic from '@keystatic/astro';
 import vercel from '@astrojs/vercel';
+import { loadEnv } from 'vite';
 
 // Every page is pre-built static HTML. Only the Keystatic admin (/keystatic and
 // /api/keystatic) runs on demand, as a Vercel function.
@@ -17,6 +18,10 @@ const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERC
 const site =
   process.env.SITE_URL ||
   (process.env.VERCEL && process.env.SITE_INDEXING !== 'true' && vercelHost ? `https://${vercelHost}` : LIVE);
+
+// Payload test: CMS=payload makes the site read the Payload CMS in cms/ (see src/lib/cms.ts).
+// The Keystatic admin is then left out, so nobody edits content the site no longer reads.
+const usePayload = (process.env.CMS ?? loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '').CMS) === 'payload';
 
 export default defineConfig({
   site,
@@ -31,6 +36,6 @@ export default defineConfig({
     react(),
     markdoc(),
     sitemap({ filter: (page) => !page.includes('/404') }),
-    keystatic(),
+    ...(usePayload ? [] : [keystatic()]),
   ],
 });

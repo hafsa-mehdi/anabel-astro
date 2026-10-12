@@ -1,18 +1,18 @@
 ---
 // One route for two kinds of root-level pages, so URLs stay identical to the live site:
-//   /hole-or-tear-repair/ (and future repair pages) → Keystatic "Repair pages"
+//   /hole-or-tear-repair/ (and future repair pages) → CMS "Repair pages"
 //   /the-art-of-rug-cleaning-.../ (blog posts)       → src/content/posts
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import RepairPage from '../components/RepairPage.astro';
 import PostPage from '../components/PostPage.astro';
 import AreaPage from '../components/AreaPage.astro';
-import { reader, getSettings, markdocToHtml, mustRead, imageInfo } from '../lib/cms';
+import { getAll, getOne, getRepair, getSettings, mustRead, imageInfo } from '../lib/cms';
 import { service, blogPosting } from '../lib/schema';
 
 export async function getStaticPaths() {
-  const repairs = await reader.collections.repairs.all({ resolveLinkedFiles: true });
-  const areas = await reader.collections.areas.all();
+  const repairs = await getAll('repairs');
+  const areas = await getAll('areas');
   const posts = await getCollection('posts');
   return [
     ...areas.map((a) => ({ params: { slug: a.slug }, props: { kind: 'area' as const, slug: a.slug } })),
@@ -22,7 +22,7 @@ export async function getStaticPaths() {
 }
 
 const { kind, slug } = Astro.props as { kind: 'repair' | 'post' | 'area'; slug: string };
-const area = kind === 'area' ? await reader.collections.areas.read(slug) : null;
+const area = kind === 'area' ? await getOne('areas', slug) : null;
 const areaHero = area ? imageInfo(area.heroImage) : null;
 const s = await getSettings();
 const site = Astro.site!;
@@ -31,18 +31,16 @@ const cleaning = await mustRead('cleaning');
 const posts = await getCollection('posts');
 const latestPost = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
 
-let repair: Awaited<ReturnType<typeof reader.collections.repairs.read>> = null;
-let bodyHtml = '';
+const repairPage = kind === 'repair' ? await getRepair(slug) : null;
+const repair = repairPage?.entry ?? null;
+const bodyHtml = repairPage?.bodyHtml ?? '';
 let post: CollectionEntry<'posts'> | undefined;
-if (kind === 'repair') {
-  repair = await reader.collections.repairs.read(slug, { resolveLinkedFiles: true });
-  bodyHtml = await markdocToHtml(repair?.body as any);
-} else {
+if (kind === 'post') {
   post = posts.find((p) => p.id === slug);
 }
 
 const cleaningLink = { label: 'Rug cleaning in Louisville', url: '/louisville-rug-cleaning/', text: cleaning.lead };
-const holeRepair = await reader.collections.repairs.read('hole-or-tear-repair');
+const holeRepair = await getOne('repairs', 'hole-or-tear-repair');
 const repairHero = repair ? imageInfo(repair.heroImage) : null;
 ---
 

@@ -1,0 +1,17 @@
+# Local Postgres for the Payload CMS test (npm run db:up). Port 5433 so it does not clash
+# with any other Postgres on this computer. Data survives restarts (pgdata volume).
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: payload
+      POSTGRES_PASSWORD: payload
+      POSTGRES_DB: anabels
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

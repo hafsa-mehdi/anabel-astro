@@ -8,3 +8,8 @@ _old-build/
 public/images/_r/
 
 Claude outputs/
+
+# Payload test: downloaded by scripts/payload-sync.mjs when CMS=payload
+src/generated/payload-content.json
+src/generated/payload-assets/
+public/images/uploads/_payload/

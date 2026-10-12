@@ -7,12 +7,12 @@ import Icon from '../components/Icon.astro';
 import CleaningSteps from '../components/CleaningSteps.astro';
 import Reviews from '../components/Reviews.astro';
 import ShowroomMap from '../components/ShowroomMap.astro';
-import { getSettings, mustRead, absoluteImage, accent, reader } from '../lib/cms';
+import { getSettings, mustRead, absoluteImage, accent, readSingleton } from '../lib/cms';
 import { localBusiness } from '../lib/schema';
 
 const s = await getSettings();
 const home = await mustRead('home');
-const visitPage = await reader.singletons.visit.read();
+const visitPage = await readSingleton('visit');
 const site = Astro.site!;
 const { hero, marquee, services, cleaning, repairs, reviews, visit } = home;
 ---
