@@ -35,6 +35,14 @@ const posts = defineCollection({
       pubDate: z.coerce.date(),
       heroImage: image().optional(),
       heroAlt: z.string().default(''),
+      // Editor-controlled schema (see structuredData() in keystatic.config.ts); Payload sends empty fields as null
+      structuredData: z
+        .object({
+          faq: z.array(z.object({ question: z.string().nullish(), answer: z.string().nullish() })).nullish(),
+          type: z.string().nullish(),
+          off: z.boolean().nullish(),
+        })
+        .nullish(),
     }),
 });
 

@@ -11,6 +11,7 @@ import {
   linkList,
   rowLabel,
   seo,
+  structuredData,
   tabs,
   text,
   textList,
@@ -33,9 +34,9 @@ const page = (slug: string, label: string, fields: GlobalConfig['fields']): Glob
   fields,
 })
 
-/** "Content" tab with the page's fields, "SEO" tab with its seo group. */
+/** "Content" tab with the page's fields, "SEO" tab with its seo and structured data groups. */
 const contentAndSeo = (pageName: string, fields: GlobalConfig['fields']) => [
-  tabs(['Content', fields], ['SEO', [seo(pageName)]]),
+  tabs(['Content', fields], ['SEO', [seo(pageName), structuredData()]]),
 ]
 
 const kicker = (example?: string) => text('kicker', 'Small line above the headline', example && `e.g. ${example}`)
@@ -153,7 +154,7 @@ export const Home = page('home', 'Homepage', [
         ),
       ],
     ],
-    ['SEO', [seo('homepage')]],
+    ['SEO', [seo('homepage'), structuredData()]],
   ),
 ])
 
@@ -197,7 +198,7 @@ export const Cleaning = page('cleaning', 'Cleaning page', [
         group('interval', 'How often to clean', [text('heading', 'Heading'), textarea('body', 'Text')]),
       ],
     ],
-    ['SEO', [seo('Rug Cleaning page')]],
+    ['SEO', [seo('Rug Cleaning page'), structuredData({ pageType: true, service: true })]],
   ),
 ])
 

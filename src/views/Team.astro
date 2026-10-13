@@ -2,8 +2,11 @@
 import Base from '../layouts/Base.astro';
 import Img from '../components/Img.astro';
 import VisitStrip from '../components/VisitStrip.astro';
-import { mustRead, accent, paragraphs, imageInfo } from '../lib/cms';
+import Faq from '../components/Faq.astro';
+import { getSettings, mustRead, accent, paragraphs, imageInfo } from '../lib/cms';
+import { editorSchemas } from '../lib/schema';
 
+const s = await getSettings();
 const page = await mustRead('team');
 const home = await mustRead('home');
 const story = imageInfo(page.story.image);
@@ -16,6 +19,8 @@ const storySizes = '(min-width: 1024px) 40vw, min(20rem, 90vw)';
   image={page.story.image}
   imageAlt={page.story.imageAlt}
   crumbs={[{ name: 'Meet the team', url: '/team/' }]}
+  jsonLd={editorSchemas(page.structuredData, s)}
+  schemaOff={!!page.structuredData?.off}
 >
   <section class="t-hero" aria-labelledby="t-title">
     <div class="glow" aria-hidden="true"></div>
@@ -62,6 +67,8 @@ const storySizes = '(min-width: 1024px) 40vw, min(20rem, 90vw)';
       </ul>
     </div>
   </section>
+
+  <Faq data={page.structuredData} />
 
   <VisitStrip label={home.visit.label} heading={home.visit.heading} intro={home.visit.intro} />
 </Base>

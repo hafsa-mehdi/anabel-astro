@@ -123,6 +123,76 @@ export const seo = (pageName: string): GroupField => ({
   ],
 })
 
+/**
+ * Editor-controlled structured data (schema.org) for one page, shown in its SEO tab.
+ * `pageType`: the page-type dropdown (pages whose main schema is a Service or an article).
+ * `service`: service name, starting price and areas served (pages described as a Service).
+ * Same names as structuredData() in keystatic.config.ts; src/lib/schema.ts turns it into JSON-LD.
+ */
+export const structuredData = ({ pageType = false, service = false } = {}): GroupField =>
+  group(
+    'structuredData',
+    'Structured data (schema)',
+    [
+      {
+        name: 'faq',
+        label: 'FAQ',
+        type: 'array',
+        labels: { singular: 'Question', plural: 'Questions' },
+        admin: {
+          description:
+            'Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.',
+          ...rowLabel('question', 'Question'),
+        },
+        fields: [text('question', 'Question', undefined, { required: true }), { ...textarea('answer', 'Answer'), required: true }],
+      },
+      ...(pageType
+        ? [
+            {
+              name: 'type',
+              label: 'Page type for Google',
+              type: 'select',
+              defaultValue: 'auto',
+              options: [
+                { label: 'Automatic', value: 'auto' },
+                { label: 'Service', value: 'Service' },
+                { label: 'Article', value: 'Article' },
+                { label: 'Blog post', value: 'BlogPosting' },
+                { label: 'Plain web page', value: 'WebPage' },
+              ],
+              admin: { description: 'Leave on Automatic unless this page is really something else, like an article.' },
+            } as SelectField,
+          ]
+        : []),
+      ...(service
+        ? [
+            {
+              type: 'row',
+              fields: [
+                text('serviceName', 'Service name', 'Leave empty to use the page name.'),
+                {
+                  name: 'startingPrice',
+                  label: 'Starting price (US$, optional)',
+                  type: 'number',
+                  min: 0,
+                  admin: { description: 'Only a price the shop really charges, e.g. 150 for "from $150".' },
+                },
+              ],
+            } as RowField,
+            textList('areaServed', 'Areas served', 'Area', 'Leave empty to use Louisville and the service areas from Site settings.'),
+          ]
+        : []),
+      {
+        name: 'off',
+        label: 'Turn off automatic schema for this page',
+        type: 'checkbox',
+        defaultValue: false,
+        admin: { description: 'Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).' },
+      },
+    ],
+    'Helps Google and AI search understand this page. Filled in automatically: only change what you need.',
+  )
+
 export const imagePosition: SelectField = {
   name: 'imagePosition',
   label: 'Image position (design option)',

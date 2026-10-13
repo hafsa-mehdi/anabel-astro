@@ -7,8 +7,8 @@ import Base from '../layouts/Base.astro';
 import RepairPage from '../components/RepairPage.astro';
 import PostPage from '../components/PostPage.astro';
 import AreaPage from '../components/AreaPage.astro';
-import { getOne, getRepair, getSettings, getPosts, mustRead, imageInfo, postImageSrc, type PostEntry } from '../lib/cms';
-import { service, blogPosting } from '../lib/schema';
+import { getOne, getRepair, getSettings, getPosts, mustRead, imageInfo, absoluteImage, postImageSrc, type PostEntry } from '../lib/cms';
+import { editorSchemas } from '../lib/schema';
 
 interface Props {
   kind: 'repair' | 'post' | 'area';
@@ -46,7 +46,17 @@ const repairHero = repair ? imageInfo(repair.heroImage) : null;
       imageAlt={repair.heroAlt}
       crumbs={[{ name: repair.title, url: `/${slug}/` }]}
       preloadImage={repairHero ? { href: repairHero.fallback, srcset: repairHero.srcset, sizes: '(min-width: 1024px) 50vw, 100vw' } : undefined}
-      jsonLd={[service({ name: repair.title, serviceType: 'Rug repair', description: repair.seoDescription, url, s })]}
+      jsonLd={editorSchemas(repair.structuredData, s, {
+        page: {
+          type: 'Service',
+          name: repair.title,
+          serviceType: 'Rug repair',
+          description: repair.seoDescription,
+          url,
+          image: absoluteImage(repair.heroImage, site),
+        },
+      })}
+      schemaOff={!!repair.structuredData?.off}
     >
       <RepairPage
         slug={slug}
@@ -74,16 +84,17 @@ const repairHero = repair ? imageInfo(repair.heroImage) : null;
         { name: 'Blog', url: '/blog/' },
         { name: post.data.title, url: `/${post.id}/` },
       ]}
-      jsonLd={[
-        blogPosting({
-          title: post.data.title,
+      jsonLd={editorSchemas(post.data.structuredData, s, {
+        page: {
+          type: 'BlogPosting',
+          name: post.data.title,
           description: post.data.description,
           url,
           image: postImageSrc(post) ? new URL(postImageSrc(post)!, site).href : undefined,
           date: post.data.pubDate,
-          s,
-        }),
-      ]}
+        },
+      })}
+      schemaOff={!!post.data.structuredData?.off}
     >
       <PostPage
         post={post}
@@ -107,7 +118,17 @@ const repairHero = repair ? imageInfo(repair.heroImage) : null;
         { name: area.title, url: `/${slug}/` },
       ]}
       preloadImage={areaHero ? { href: areaHero.fallback, srcset: areaHero.srcset, sizes: '(min-width: 1024px) 45vw, 100vw' } : undefined}
-      jsonLd={[service({ name: area.title, serviceType: 'Rug cleaning', description: area.seoDescription, url, s })]}
+      jsonLd={editorSchemas(area.structuredData, s, {
+        page: {
+          type: 'Service',
+          name: area.title,
+          serviceType: 'Rug cleaning',
+          description: area.seoDescription,
+          url,
+          image: absoluteImage(area.heroImage, site),
+        },
+      })}
+      schemaOff={!!area.structuredData?.off}
     >
       <AreaPage entry={area} />
     </Base>

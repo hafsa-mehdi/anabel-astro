@@ -15,6 +15,8 @@ interface Props {
   imageAlt?: string;
   type?: 'website' | 'article';
   jsonLd?: object[];
+  /** The editor turned structured data off for this page: no JSON-LD at all, not even breadcrumbs. */
+  schemaOff?: boolean;
   /** Inner pages: [{ name, url }]. Home is added automatically. */
   crumbs?: { name: string; url: string }[];
   noindex?: boolean;
@@ -31,6 +33,7 @@ const {
   imageAlt,
   type = 'website',
   jsonLd = [],
+  schemaOff = false,
   crumbs,
   noindex: pageNoindex = false,
   preloadImage,
@@ -47,7 +50,7 @@ const ogImage =
   (image?.startsWith('http') ? image : absoluteImage(image, site)) ??
   absoluteImage('/images/uploads/home/services/cards/0/image.webp', site);
 const trail = crumbs ? [{ name: 'Home', url: '/' }, ...crumbs] : null;
-const schemas = [...jsonLd, ...(trail ? [crumbSchema(trail)] : [])];
+const schemas = schemaOff ? [] : [...jsonLd, ...(trail ? [crumbSchema(trail)] : [])];
 ---
 
 <!doctype html>

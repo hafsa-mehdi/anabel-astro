@@ -1,6 +1,7 @@
 // JSON-LD structured data builders (schema.org) for Google rich results.
+// Pages call editorSchemas(), which applies what editors set in the "Structured data" fields.
 import type { Settings } from './cms';
-import { telHref } from './cms';
+import { absoluteImage, telHref } from './cms';
 
 const SITE = (import.meta.env.SITE ?? 'https://anabelsorientalrugs.com').replace(/\/$/, '');
 export const BUSINESS_ID = `${SITE}/#business`;
@@ -15,7 +16,9 @@ const dayMap: Record<string, string> = {
   Sunday: 'https://schema.org/Sunday',
 };
 
+/** The business. `image`: used when Site settings has no business photo. */
 export function localBusiness(s: Settings, image?: string) {
+  const photo = absoluteImage(s.business?.image, new URL(SITE)) ?? image;
   return {
     '@context': 'https://schema.org',
     '@type': 'HomeAndConstructionBusiness',
@@ -23,7 +26,9 @@ export function localBusiness(s: Settings, image?: string) {
     name: s.businessName,
     url: `${SITE}/`,
     logo: new URL(s.logo ?? '/images/uploads/site/logo.png', SITE).href,
-    ...(image ? { image } : {}),
+    ...(photo ? { image: photo } : {}),
+    ...(s.business?.description ? { description: s.business.description } : {}),
+    ...(s.business?.priceRange ? { priceRange: s.business.priceRange } : {}),
     telephone: telHref(s.phone).replace('tel:', ''),
     email: s.email,
     address: {
@@ -56,7 +61,21 @@ export function localBusiness(s: Settings, image?: string) {
   };
 }
 
-export function service(opts: { name: string; description: string; url: string; serviceType: string; s: Settings }) {
+const defaultAreas = (s: Settings) => [
+  { '@type': 'City', name: 'Louisville' },
+  ...s.serviceAreas.map((a) => ({ '@type': 'State', name: a.label })),
+];
+
+export function service(opts: {
+  name: string;
+  description: string;
+  url: string;
+  serviceType: string;
+  s: Settings;
+  areaServed?: readonly (string | null)[] | null;
+  startingPrice?: number | null;
+}) {
+  const areas = (opts.areaServed ?? []).filter((a): a is string => !!a?.trim());
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -65,10 +84,15 @@ export function service(opts: { name: string; description: string; url: string; 
     description: opts.description,
     url: opts.url,
     provider: { '@id': BUSINESS_ID, '@type': 'HomeAndConstructionBusiness', name: opts.s.businessName },
-    areaServed: [
-      { '@type': 'City', name: 'Louisville' },
-      ...opts.s.serviceAreas.map((a) => ({ '@type': 'State', name: a.label })),
-    ],
+    areaServed: areas.length ? areas.map((name) => ({ '@type': 'Place', name })) : defaultAreas(opts.s),
+    ...(opts.startingPrice != null
+      ? {
+          offers: {
+            '@type': 'Offer',
+            priceSpecification: { '@type': 'PriceSpecification', minPrice: opts.startingPrice, priceCurrency: 'USD' },
+          },
+        }
+      : {}),
   };
 }
 
@@ -86,22 +110,23 @@ export function breadcrumbs(items: { name: string; url: string }[]) {
 }
 
 export function blogPosting(opts: {
+  type?: 'BlogPosting' | 'Article';
   title: string;
   description: string;
   url: string;
   image?: string;
-  date: Date;
+  date?: Date;
   s: Settings;
 }) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
+    '@type': opts.type ?? 'BlogPosting',
     headline: opts.title,
     description: opts.description,
     mainEntityOfPage: opts.url,
     url: opts.url,
     ...(opts.image ? { image: [opts.image] } : {}),
-    datePublished: opts.date.toISOString(),
+    ...(opts.date ? { datePublished: opts.date.toISOString() } : {}),
     author: { '@type': 'Organization', name: opts.s.businessName, url: `${SITE}/` },
     publisher: {
       '@type': 'Organization',
@@ -109,4 +134,98 @@ export function blogPosting(opts: {
       logo: { '@type': 'ImageObject', url: new URL(opts.s.logo ?? '/images/uploads/site/logo.png', SITE).href },
     },
   };
+}
+
+// --- Editor-controlled schema ("Structured data" fields in the CMS) ---------------------------
+
+export type FaqItem = { question?: string | null; answer?: string | null };
+
+/** The "Structured data" group of a page, as either CMS stores it (Payload leaves empty fields null). */
+export type StructuredData =
+  | {
+      faq?: readonly FaqItem[] | null;
+      type?: string | null;
+      serviceName?: string | null;
+      startingPrice?: number | null;
+      areaServed?: readonly (string | null)[] | null;
+      off?: boolean | null;
+    }
+  | null
+  | undefined;
+
+type PageType = 'Service' | 'Article' | 'BlogPosting' | 'WebPage';
+const PAGE_TYPES: readonly string[] = ['Service', 'Article', 'BlogPosting', 'WebPage'];
+
+/** What a page knows about itself; enough to describe it as any of the page types. */
+export type PageInfo = {
+  /** Used when the page type is "Automatic". */
+  type: PageType;
+  name: string;
+  description: string;
+  url: string;
+  image?: string;
+  date?: Date;
+  /** Service pages: e.g. "Rug repair". */
+  serviceType?: string;
+};
+
+/** FAQ entries with both a question and an answer. */
+export const faqItems = (sd: StructuredData) =>
+  (sd?.faq ?? [])
+    .map((f) => ({ question: f.question?.trim() ?? '', answer: f.answer?.trim() ?? '' }))
+    .filter((f) => f.question && f.answer);
+
+export function faqPage(items: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  };
+}
+
+function pageEntity(type: PageType, page: PageInfo, sd: StructuredData, s: Settings) {
+  if (type === 'Service') {
+    return service({
+      name: sd?.serviceName?.trim() || page.name,
+      serviceType: page.serviceType ?? page.name,
+      description: page.description,
+      url: page.url,
+      s,
+      areaServed: sd?.areaServed,
+      startingPrice: sd?.startingPrice,
+    });
+  }
+  if (type === 'Article' || type === 'BlogPosting') {
+    return blogPosting({ type, title: page.name, description: page.description, url: page.url, image: page.image, date: page.date, s });
+  }
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: page.name,
+    description: page.description,
+    url: page.url,
+    publisher: { '@id': BUSINESS_ID },
+  };
+}
+
+/**
+ * The JSON-LD for a page: its main entity (`page`, in the type the editor picked), any fixed
+ * extras (`extra`, e.g. the business on the homepage) and the FAQ. Nothing when the editor
+ * turned schema off (Base.astro then leaves out the breadcrumbs too).
+ */
+export function editorSchemas(sd: StructuredData, s: Settings, opts: { page?: PageInfo; extra?: object[] } = {}): object[] {
+  if (sd?.off) return [];
+  const out: object[] = [];
+  if (opts.page) {
+    const picked = sd?.type && PAGE_TYPES.includes(sd.type) ? (sd.type as PageType) : opts.page.type;
+    out.push(pageEntity(picked, opts.page, sd, s));
+  }
+  out.push(...(opts.extra ?? []));
+  const faq = faqItems(sd);
+  if (faq.length) out.push(faqPage(faq));
+  return out;
 }

@@ -1,6 +1,6 @@
 // Repair pages, service areas, blog posts and testimonials (Keystatic "collections").
 import type { CollectionConfig, Field } from 'payload'
-import { altText, heading, image, slug, tabs, text, textList, textarea } from '../fields'
+import { altText, heading, image, slug, structuredData, tabs, text, textList, textarea } from '../fields'
 import { rebuildAfterChange, rebuildAfterDelete } from '../hooks/rebuild'
 import { richTextToHTML } from '../richTextHtml'
 
@@ -59,6 +59,7 @@ export const Repairs: CollectionConfig = {
         [
           text('seoTitle', 'SEO title', 'Shown in Google results and the browser tab. Aim for 50–60 characters.'),
           textarea('seoDescription', 'SEO description', 'Aim for 140–160 characters.'),
+          structuredData({ pageType: true, service: true }),
         ],
       ],
     ),
@@ -87,7 +88,10 @@ export const Areas: CollectionConfig = {
         ],
       ],
       ['Booking form', [text('formHeading', 'Booking form heading'), textarea('formIntro', 'Line above the booking form')]],
-      ['SEO', [text('seoTitle', 'SEO title'), textarea('seoDescription', 'SEO description')]],
+      [
+        'SEO',
+        [text('seoTitle', 'SEO title'), textarea('seoDescription', 'SEO description'), structuredData({ pageType: true, service: true })],
+      ],
     ),
   ],
 }
@@ -108,10 +112,18 @@ export const Posts: CollectionConfig = {
       required: true,
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly', displayFormat: 'MMMM d, yyyy' } },
     },
-    textarea('description', 'Summary', 'Shown on the blog listing and in Google results. Two sentences at most.'),
-    image('heroImage', 'Top photo', 'Shown on the post and the blog listing.'),
-    altText('heroAlt', 'the top photo'),
-    ...richText('content', 'Post text'),
+    tabs(
+      [
+        'Content',
+        [
+          textarea('description', 'Summary', 'Shown on the blog listing and in Google results. Two sentences at most.'),
+          image('heroImage', 'Top photo', 'Shown on the post and the blog listing.'),
+          altText('heroAlt', 'the top photo'),
+          ...richText('content', 'Post text'),
+        ],
+      ],
+      ['SEO', [structuredData({ pageType: true })]],
+    ),
   ],
 }
 

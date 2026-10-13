@@ -210,6 +210,46 @@ export interface Repair {
    * Aim for 140–160 characters.
    */
   seoDescription?: string | null;
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave on Automatic unless this page is really something else, like an article.
+     */
+    type?: ('auto' | 'Service' | 'Article' | 'BlogPosting' | 'WebPage') | null;
+    /**
+     * Leave empty to use the page name.
+     */
+    serviceName?: string | null;
+    /**
+     * Only a price the shop really charges, e.g. 150 for "from $150".
+     */
+    startingPrice?: number | null;
+    /**
+     * Leave empty to use Louisville and the service areas from Site settings.
+     */
+    areaServed?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -281,6 +321,46 @@ export interface Area {
   formIntro?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave on Automatic unless this page is really something else, like an article.
+     */
+    type?: ('auto' | 'Service' | 'Article' | 'BlogPosting' | 'WebPage') | null;
+    /**
+     * Leave empty to use the page name.
+     */
+    serviceName?: string | null;
+    /**
+     * Only a price the shop really charges, e.g. 150 for "from $150".
+     */
+    startingPrice?: number | null;
+    /**
+     * Leave empty to use Louisville and the service areas from Site settings.
+     */
+    areaServed?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -329,6 +409,29 @@ export interface Post {
     [k: string]: unknown;
   } | null;
   contentHtml?: string | null;
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave on Automatic unless this page is really something else, like an article.
+     */
+    type?: ('auto' | 'Service' | 'Article' | 'BlogPosting' | 'WebPage') | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -498,6 +601,27 @@ export interface RepairsSelect<T extends boolean = true> {
   ctaText?: T;
   seoTitle?: T;
   seoDescription?: T;
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        type?: T;
+        serviceName?: T;
+        startingPrice?: T;
+        areaServed?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        off?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -526,6 +650,27 @@ export interface AreasSelect<T extends boolean = true> {
   formIntro?: T;
   seoTitle?: T;
   seoDescription?: T;
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        type?: T;
+        serviceName?: T;
+        startingPrice?: T;
+        areaServed?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        off?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -544,6 +689,19 @@ export interface PostsSelect<T extends boolean = true> {
   heroAlt?: T;
   content?: T;
   contentHtml?: T;
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        type?: T;
+        off?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -803,6 +961,25 @@ export interface Home {
      */
     description?: string | null;
   };
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
+  };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -883,6 +1060,46 @@ export interface Cleaning {
      */
     description?: string | null;
   };
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave on Automatic unless this page is really something else, like an article.
+     */
+    type?: ('auto' | 'Service' | 'Article' | 'BlogPosting' | 'WebPage') | null;
+    /**
+     * Leave empty to use the page name.
+     */
+    serviceName?: string | null;
+    /**
+     * Only a price the shop really charges, e.g. 150 for "from $150".
+     */
+    startingPrice?: number | null;
+    /**
+     * Leave empty to use Louisville and the service areas from Site settings.
+     */
+    areaServed?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
+  };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -927,6 +1144,25 @@ export interface Visit {
      * The short summary under the title in Google results. Aim for 140–160 characters.
      */
     description?: string | null;
+  };
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -987,6 +1223,25 @@ export interface Team {
      */
     description?: string | null;
   };
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
+  };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1024,6 +1279,25 @@ export interface Tour {
      * The short summary under the title in Google results. Aim for 140–160 characters.
      */
     description?: string | null;
+  };
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1082,6 +1356,25 @@ export interface Designer {
      */
     description?: string | null;
   };
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
+  };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1106,6 +1399,25 @@ export interface Blog {
      * The short summary under the title in Google results. Aim for 140–160 characters.
      */
     description?: string | null;
+  };
+  /**
+   * Helps Google and AI search understand this page. Filled in automatically: only change what you need.
+   */
+  structuredData?: {
+    /**
+     * Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.
+     */
+    faq?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     */
+    off?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1138,6 +1450,23 @@ export interface Setting {
    * Used by Google and when pages are shared on social media. The header shows the name above instead.
    */
   logo?: (number | null) | Media;
+  /**
+   * Added to the structured data (schema) that describes the business on every page.
+   */
+  business?: {
+    /**
+     * One or two plain sentences about what the shop does.
+     */
+    description?: string | null;
+    /**
+     * e.g. $$ or $100–$1,000. Leave empty if unsure.
+     */
+    priceRange?: string | null;
+    /**
+     * A photo of the showroom or shop front. Leave empty to use the homepage photo.
+     */
+    image?: (number | null) | Media;
+  };
   /**
    * Written the way visitors should see it, e.g. 502 895 9595. The click-to-call link is created automatically.
    */
@@ -1390,6 +1719,18 @@ export interface HomeSelect<T extends boolean = true> {
         title?: T;
         description?: T;
       };
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        off?: T;
+      };
   _status?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1450,6 +1791,27 @@ export interface CleaningSelect<T extends boolean = true> {
         title?: T;
         description?: T;
       };
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        type?: T;
+        serviceName?: T;
+        startingPrice?: T;
+        areaServed?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        off?: T;
+      };
   _status?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1480,6 +1842,18 @@ export interface VisitSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+      };
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        off?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1517,6 +1891,18 @@ export interface TeamSelect<T extends boolean = true> {
         title?: T;
         description?: T;
       };
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        off?: T;
+      };
   _status?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1538,6 +1924,18 @@ export interface TourSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+      };
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        off?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1576,6 +1974,18 @@ export interface DesignersSelect<T extends boolean = true> {
         title?: T;
         description?: T;
       };
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        off?: T;
+      };
   _status?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1593,6 +2003,18 @@ export interface BlogSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+      };
+  structuredData?:
+    | T
+    | {
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        off?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1612,6 +2034,13 @@ export interface SettingsSelect<T extends boolean = true> {
         tagline?: T;
       };
   logo?: T;
+  business?:
+    | T
+    | {
+        description?: T;
+        priceRange?: T;
+        image?: T;
+      };
   phone?: T;
   email?: T;
   address?:

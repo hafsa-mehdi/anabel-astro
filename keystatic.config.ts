@@ -56,6 +56,67 @@ const seo = (pageName: string) =>
     { label: 'Search engine (SEO) settings' },
   );
 
+// Editor-controlled structured data (schema.org) for one page. Same names as structuredData()
+// in cms/src/fields.ts; src/lib/schema.ts turns it into JSON-LD.
+//  pageType: the page-type dropdown. service: service name, starting price, areas served.
+const structuredData = ({ pageType = false, service = false } = {}) =>
+  fields.object(
+    {
+      faq: fields.array(
+        fields.object({
+          question: fields.text({ label: 'Question', validation: { isRequired: true } }),
+          answer: fields.text({ label: 'Answer', multiline: true, validation: { isRequired: true } }),
+        }),
+        {
+          label: 'FAQ',
+          description:
+            'Questions and answers shown on the page (above the related links) and added to the schema. Only real questions customers ask, answered in a few sentences.',
+          itemLabel: (p) => p.fields.question.value || 'Question',
+        },
+      ),
+      ...(pageType
+        ? {
+            type: fields.select({
+              label: 'Page type for Google',
+              description: 'Leave on Automatic unless this page is really something else, like an article.',
+              options: [
+                { label: 'Automatic', value: 'auto' },
+                { label: 'Service', value: 'Service' },
+                { label: 'Article', value: 'Article' },
+                { label: 'Blog post', value: 'BlogPosting' },
+                { label: 'Plain web page', value: 'WebPage' },
+              ],
+              defaultValue: 'auto',
+            }),
+          }
+        : {}),
+      ...(service
+        ? {
+            serviceName: fields.text({ label: 'Service name', description: 'Leave empty to use the page name.' }),
+            startingPrice: fields.number({
+              label: 'Starting price (US$, optional)',
+              description: 'Only a price the shop really charges, e.g. 150 for "from $150".',
+              validation: { min: 0 },
+            }),
+            areaServed: fields.array(fields.text({ label: 'Area' }), {
+              label: 'Areas served',
+              description: 'Leave empty to use Louisville and the service areas from Site settings.',
+              itemLabel: (p) => p.value || 'Area',
+            }),
+          }
+        : {}),
+      off: fields.checkbox({
+        label: 'Turn off automatic schema for this page',
+        description: 'Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).',
+        defaultValue: false,
+      }),
+    },
+    {
+      label: 'Structured data (schema)',
+      description: 'Helps Google and AI search understand this page. Filled in automatically: only change what you need.',
+    },
+  );
+
 const accentHelp = 'Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.';
 
 const paragraphs = (label: string, description = 'Leave an empty line between paragraphs.') =>
@@ -108,6 +169,21 @@ export default config({
           { label: 'Header name', description: 'The name shown in the middle of the header and in the footer.' },
         ),
         logo: uploadImage('site', 'Logo image', 'Used by Google and when pages are shared on social media. The header shows the name below instead.'),
+        business: fields.object(
+          {
+            description: fields.text({
+              label: 'Short business description',
+              description: 'One or two plain sentences about what the shop does.',
+              multiline: true,
+            }),
+            priceRange: fields.text({ label: 'Price range (optional)', description: 'e.g. $$ or $100–$1,000. Leave empty if unsure.' }),
+            image: uploadImage('site', 'Business photo', 'A photo of the showroom or shop front. Leave empty to use the homepage photo.'),
+          },
+          {
+            label: 'Business details for Google',
+            description: 'Added to the structured data (schema) that describes the business on every page.',
+          },
+        ),
         phone: fields.text({
           label: 'Phone number',
           description: 'Written the way visitors should see it, e.g. 502 895 9595. The click-to-call link is created automatically.',
@@ -230,6 +306,7 @@ export default config({
       format: { data: 'yaml' },
       schema: {
         seo: seo('homepage'),
+        structuredData: structuredData(),
         hero: fields.object(
           {
             kicker: fields.text({ label: 'Small line above the headline', description: 'e.g. Frankfort Avenue · Louisville' }),
@@ -326,6 +403,7 @@ export default config({
       format: { data: 'yaml' },
       schema: {
         seo: seo('Rug Cleaning page'),
+        structuredData: structuredData({ pageType: true, service: true }),
         heroImage: uploadImage('cleaning', 'Top photo'),
         heroAlt: altText('the top photo'),
         kicker: fields.text({ label: 'Small line above the headline', description: 'e.g. Hand-washed in Louisville' }),
@@ -383,6 +461,7 @@ export default config({
       format: { data: 'yaml' },
       schema: {
         seo: seo('Visit / Contact page'),
+        structuredData: structuredData(),
         kicker: fields.text({ label: 'Small line above the headline' }),
         heading: fields.text({ label: 'Main headline (H1)', description: accentHelp }),
         intro: fields.text({ label: 'Intro', multiline: true }),
@@ -409,6 +488,7 @@ export default config({
       format: { data: 'yaml' },
       schema: {
         seo: seo('Team page'),
+        structuredData: structuredData(),
         kicker: fields.text({ label: 'Small line above the headline' }),
         heading: fields.text({ label: 'Main headline (H1)', description: accentHelp }),
         story: fields.object(
@@ -440,6 +520,7 @@ export default config({
       format: { data: 'yaml' },
       schema: {
         seo: seo('Tour page'),
+        structuredData: structuredData(),
         kicker: fields.text({ label: 'Small line above the headline' }),
         heading: fields.text({ label: 'Main headline (H1)', description: accentHelp }),
         intro: fields.text({ label: 'Intro', multiline: true }),
@@ -459,6 +540,7 @@ export default config({
       format: { data: 'yaml' },
       schema: {
         seo: seo('Designer program page'),
+        structuredData: structuredData(),
         kicker: fields.text({ label: 'Small line above the headline' }),
         heading: fields.text({ label: 'Main headline (H1)', description: accentHelp }),
         intro: fields.text({ label: 'Intro', multiline: true }),
@@ -489,6 +571,7 @@ export default config({
       format: { data: 'yaml' },
       schema: {
         seo: seo('blog listing page'),
+        structuredData: structuredData(),
         heading: fields.text({ label: 'Main headline (H1)', description: accentHelp }),
         intro: fields.text({ label: 'Intro', multiline: true }),
       },
@@ -514,6 +597,7 @@ export default config({
         }),
         seoTitle: fields.text({ label: 'SEO title', description: 'Shown in Google results and the browser tab. Aim for 50–60 characters.' }),
         seoDescription: fields.text({ label: 'SEO description', description: 'Aim for 140–160 characters.', multiline: true }),
+        structuredData: structuredData({ pageType: true, service: true }),
         heroImage: uploadImage('repairs', 'Top photo'),
         heroAlt: altText('the top photo'),
         intro: fields.text({ label: 'Intro (one or two sentences)', multiline: true }),
@@ -548,6 +632,7 @@ export default config({
         }),
         seoTitle: fields.text({ label: 'SEO title' }),
         seoDescription: fields.text({ label: 'SEO description', multiline: true }),
+        structuredData: structuredData({ pageType: true, service: true }),
         kicker: fields.text({ label: 'Small line above the headline' }),
         heading: fields.text({ label: 'Main headline (H1)', description: accentHelp }),
         intro: fields.text({ label: 'Intro', multiline: true }),
@@ -586,6 +671,7 @@ export default config({
           publicPath: '../../assets/blog/',
         }),
         heroAlt: altText('the top photo'),
+        structuredData: structuredData({ pageType: true }),
         content: fields.markdoc({ label: 'Post text', extension: 'md' }),
       },
     }),

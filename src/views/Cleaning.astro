@@ -5,8 +5,9 @@ import Icon from '../components/Icon.astro';
 import BookingForm from '../components/BookingForm.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import VisitStrip from '../components/VisitStrip.astro';
-import { getSettings, mustRead, paragraphs, telHref, imageInfo, getOne, getPosts, accent } from '../lib/cms';
-import { service } from '../lib/schema';
+import Faq from '../components/Faq.astro';
+import { getSettings, mustRead, paragraphs, telHref, imageInfo, absoluteImage, getOne, getPosts, accent } from '../lib/cms';
+import { editorSchemas } from '../lib/schema';
 
 const s = await getSettings();
 const page = await mustRead('cleaning');
@@ -31,15 +32,17 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
   image={page.heroImage}
   imageAlt={page.heroAlt}
   crumbs={[{ name: 'Rug cleaning', url: '/louisville-rug-cleaning/' }]}
-  jsonLd={[
-    service({
+  jsonLd={editorSchemas(page.structuredData, s, {
+    page: {
+      type: 'Service',
       name: 'Oriental and area rug cleaning',
       serviceType: 'Rug cleaning',
       description: page.seo.description,
       url,
-      s,
-    }),
-  ]}
+      image: absoluteImage(page.heroImage, site),
+    },
+  })}
+  schemaOff={!!page.structuredData?.off}
   preloadImage={hero ? { href: hero.fallback, srcset: hero.srcset, sizes: heroSizes } : undefined}
 >
   <section class="c-hero" aria-labelledby="c-title">
@@ -107,6 +110,8 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
       </div>
     </div>
   </section>
+
+  <Faq data={page.structuredData} />
 
   <RelatedLinks heading="Also from Anabel's" links={related} />
 

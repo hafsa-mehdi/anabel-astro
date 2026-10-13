@@ -3,6 +3,7 @@
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import RelatedLinks from './RelatedLinks.astro';
+import Faq from './Faq.astro';
 import { mustRead, type PostEntry } from '../lib/cms';
 
 interface Props {
@@ -65,6 +66,8 @@ const dateText = date.toLocaleDateString('en-US', { year: 'numeric', month: 'lon
     </div>
   </aside>
 </article>
+
+<Faq data={post.data.structuredData} />
 
 <RelatedLinks heading="Also from Anabel's" links={related} />
 

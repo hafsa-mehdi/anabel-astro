@@ -77,6 +77,10 @@ Optional: CMS project > Settings > Git > Ignored Build Step:
 - **Text editor** limited to what the site styles: paragraphs, H2/H3, bold, italic, lists,
   quotes, links.
 - **Alt text** is required as soon as a photo is chosen (checked on Publish).
+- **Structured data** (SEO tab of every page and post): an FAQ that shows on the page and goes
+  into its FAQPage schema, plus (repairs, service areas, cleaning, posts) the page type for
+  Google and service details, and a switch to turn schema off. Business details for Google
+  (description, price range, photo) are in Site settings. `src/lib/schema.ts` builds the JSON-LD.
 - **Branding:** Anabel's wordmark and the site's dark colours; "View website" in the top bar
   (`SITE_URL`, defaults to the Payload version of the site).
 

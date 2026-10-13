@@ -33,6 +33,16 @@ export const Settings: GlobalConfig = {
             'The name shown in the middle of the header and in the footer.',
           ),
           image('logo', 'Logo image', 'Used by Google and when pages are shared on social media. The header shows the name above instead.'),
+          group(
+            'business',
+            'Business details for Google',
+            [
+              textarea('description', 'Short business description', 'One or two plain sentences about what the shop does.'),
+              text('priceRange', 'Price range (optional)', 'e.g. $$ or $100–$1,000. Leave empty if unsure.'),
+              image('image', 'Business photo', 'A photo of the showroom or shop front. Leave empty to use the homepage photo.'),
+            ],
+            'Added to the structured data (schema) that describes the business on every page.',
+          ),
           {
             type: 'row',
             fields: [

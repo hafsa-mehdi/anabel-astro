@@ -5,7 +5,9 @@ import Icon from './Icon.astro';
 import RelatedLinks from './RelatedLinks.astro';
 import VisitStrip from './VisitStrip.astro';
 import BookingForm from './BookingForm.astro';
+import Faq from './Faq.astro';
 import { getSettings, mustRead, telHref, imageInfo } from '../lib/cms';
+import type { StructuredData } from '../lib/schema';
 
 interface Props {
   slug: string;
@@ -19,6 +21,7 @@ interface Props {
     ctaText: string;
     formHeading?: string;
     formIntro?: string;
+    structuredData?: StructuredData;
   };
   bodyHtml: string;
   related: { label: string; url: string; text: string }[];
@@ -86,6 +89,8 @@ const hero = imageInfo(entry.heroImage);
     />
   </div>
 </section>
+
+<Faq data={entry.structuredData} />
 
 <RelatedLinks heading="Also from Anabel's" links={related} />
 

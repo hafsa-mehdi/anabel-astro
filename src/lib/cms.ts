@@ -14,6 +14,7 @@ import { createReader } from '@keystatic/core/reader';
 import Markdoc from '@markdoc/markdoc';
 import keystaticConfig from '../../keystatic.config';
 import manifest from '../generated/image-manifest.json';
+import type { StructuredData } from './schema';
 
 export const usePayload = (import.meta.env.CMS ?? process.env.CMS) === 'payload';
 
@@ -74,7 +75,7 @@ export async function getRepair(slug: string) {
 /** A blog post as the pages use it. In the live preview the photo is a URL and the text is HTML. */
 export type PreviewPost = {
   id: string;
-  data: { title: string; description: string; pubDate: Date; heroImage?: string; heroAlt: string };
+  data: { title: string; description: string; pubDate: Date; heroImage?: string; heroAlt: string; structuredData?: StructuredData };
   previewHtml: string;
 };
 export type PostEntry = CollectionEntry<'posts'> | PreviewPost;
@@ -91,6 +92,7 @@ export async function getPosts(): Promise<PostEntry[]> {
       pubDate: new Date(entry.pubDate ?? Date.now()),
       heroImage: entry.heroImage ?? undefined,
       heroAlt: entry.heroAlt ?? '',
+      structuredData: entry.structuredData,
     },
     previewHtml: entry.contentHtml ?? '',
   }));

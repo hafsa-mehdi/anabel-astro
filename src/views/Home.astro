@@ -7,8 +7,9 @@ import Icon from '../components/Icon.astro';
 import CleaningSteps from '../components/CleaningSteps.astro';
 import Reviews from '../components/Reviews.astro';
 import ShowroomMap from '../components/ShowroomMap.astro';
+import Faq from '../components/Faq.astro';
 import { getSettings, mustRead, absoluteImage, accent, readSingleton } from '../lib/cms';
-import { localBusiness } from '../lib/schema';
+import { localBusiness, editorSchemas } from '../lib/schema';
 
 const s = await getSettings();
 const home = await mustRead('home');
@@ -23,7 +24,8 @@ const { hero, marquee, services, cleaning, repairs, reviews, visit } = home;
   image={services.cards[0]?.image}
   imageAlt={services.cards[0]?.imageAlt}
   heroUnderHeader
-  jsonLd={[localBusiness(s, absoluteImage(visitPage?.image, site))]}
+  jsonLd={editorSchemas(home.structuredData, s, { extra: [localBusiness(s, absoluteImage(visitPage?.image, site))] })}
+  schemaOff={!!home.structuredData?.off}
 >
   <!-- 1. Hero: headline, offer, and the 3D rug that unrolls under the buttons -->
   <section class="hero" aria-labelledby="hero-title">
@@ -133,6 +135,8 @@ const { hero, marquee, services, cleaning, repairs, reviews, visit } = home;
 
   <!-- 6. Reviews (only when testimonials exist) -->
   <Reviews label={reviews.label} heading={reviews.heading} ratingText={reviews.ratingText} />
+
+  <Faq data={home.structuredData} />
 
   <!-- 7. Animated map + visit details -->
   <section class="section visit">

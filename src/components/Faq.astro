@@ -1,0 +1,95 @@
+---
+// The FAQ editors add under SEO → Structured data. The same questions go into the page's
+// FAQPage schema (src/lib/schema.ts), so what Google reads is always what visitors see.
+import { paragraphs } from '../lib/cms';
+import { faqItems, type StructuredData } from '../lib/schema';
+
+interface Props {
+  data: StructuredData;
+  heading?: string;
+}
+const { data, heading = 'Frequently asked questions' } = Astro.props;
+const items = faqItems(data);
+---
+
+{
+  items.length > 0 && (
+    <section class="section faq" aria-labelledby="faq-title">
+      <div class="wrap faq-wrap">
+        <h2 id="faq-title">{heading}</h2>
+        <div class="faq-list">
+          {items.map((f, i) => (
+            <details data-reveal style={`--i:${i}`}>
+              <summary>{f.question}</summary>
+              <div class="faq-answer">
+                {paragraphs(f.answer).map((p) => (
+                  <p>{p}</p>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .faq-wrap {
+    max-width: calc(52rem + 2 * var(--gutter));
+  }
+  h2 {
+    font-size: clamp(1.9rem, 1.5rem + 1.2vw, 2.6rem);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .faq-list {
+    border-top: 1px solid var(--line);
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--serif);
+    font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.45rem);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ivory);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: '+';
+    flex: none;
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--gold);
+    transition: transform 0.2s ease;
+  }
+  details[open] summary::after {
+    transform: rotate(45deg);
+  }
+  summary:hover,
+  summary:focus-visible {
+    color: var(--gold);
+  }
+  .faq-answer {
+    padding: 0 2.5rem 1.4rem 0;
+    color: var(--muted);
+  }
+  .faq-answer p {
+    margin: 0 0 0.8rem;
+  }
+  .faq-answer p:last-child {
+    margin-bottom: 0;
+  }
+</style>

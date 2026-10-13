@@ -3,7 +3,9 @@ import Base from '../layouts/Base.astro';
 import Img from '../components/Img.astro';
 import Icon from '../components/Icon.astro';
 import ShowroomMap from '../components/ShowroomMap.astro';
+import Faq from '../components/Faq.astro';
 import { getSettings, mustRead, accent, imageInfo, telHref } from '../lib/cms';
+import { editorSchemas } from '../lib/schema';
 
 const s = await getSettings();
 const page = await mustRead('tour');
@@ -18,6 +20,8 @@ const posterSizes = '(min-width: 1280px) 1200px, 100vw';
   image={page.image}
   imageAlt={page.imageAlt}
   crumbs={[{ name: 'Showroom tour', url: '/tour/' }]}
+  jsonLd={editorSchemas(page.structuredData, s)}
+  schemaOff={!!page.structuredData?.off}
   preloadImage={poster ? { href: poster.fallback, srcset: poster.srcset, sizes: posterSizes } : undefined}
 >
   <section class="tour-hero" aria-labelledby="tour-title">
@@ -51,6 +55,7 @@ const posterSizes = '(min-width: 1280px) 1200px, 100vw';
       <ShowroomMap label={home.visit.label} heading={home.visit.heading} intro={home.visit.intro} />
     </div>
   </section>
+  <Faq data={page.structuredData} />
 </Base>
 
 <script>

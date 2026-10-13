@@ -5,8 +5,9 @@ import Icon from '../components/Icon.astro';
 import BookingForm from '../components/BookingForm.astro';
 import SmartLink from '../components/SmartLink.astro';
 import ShowroomMap from '../components/ShowroomMap.astro';
+import Faq from '../components/Faq.astro';
 import { getSettings, mustRead, telHref, addressLines, absoluteImage, accent, imageInfo, getAll } from '../lib/cms';
-import { localBusiness } from '../lib/schema';
+import { localBusiness, editorSchemas } from '../lib/schema';
 
 const s = await getSettings();
 const page = await mustRead('visit');
@@ -27,7 +28,8 @@ const areaCards = s.serviceAreas.map((a) => {
   image={page.image}
   imageAlt={page.imageAlt}
   crumbs={[{ name: 'Visit & contact', url: '/contact/' }]}
-  jsonLd={[localBusiness(s, absoluteImage(page.image, site))]}
+  jsonLd={editorSchemas(page.structuredData, s, { extra: [localBusiness(s, absoluteImage(page.image, site))] })}
+  schemaOff={!!page.structuredData?.off}
   preloadImage={photo ? { href: photo.fallback, srcset: photo.srcset, sizes: photoSizes } : undefined}
 >
   <section class="v-hero" aria-labelledby="v-title">
@@ -103,6 +105,7 @@ const areaCards = s.serviceAreas.map((a) => {
       <BookingForm heading={page.form.heading} intro={page.form.intro} source="Visit page" />
     </div>
   </section>
+  <Faq data={page.structuredData} />
 </Base>
 
 <style>

@@ -3,7 +3,9 @@ import Base from '../layouts/Base.astro';
 import Img from '../components/Img.astro';
 import Icon from '../components/Icon.astro';
 import DesignerForm from '../components/DesignerForm.astro';
+import Faq from '../components/Faq.astro';
 import { getSettings, mustRead, accent, imageInfo, telHref } from '../lib/cms';
+import { editorSchemas } from '../lib/schema';
 
 const s = await getSettings();
 const page = await mustRead('designers');
@@ -17,6 +19,8 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
   image={page.image}
   imageAlt={page.imageAlt}
   crumbs={[{ name: 'Designer program', url: '/designer-program/' }]}
+  jsonLd={editorSchemas(page.structuredData, s)}
+  schemaOff={!!page.structuredData?.off}
   preloadImage={hero ? { href: hero.fallback, srcset: hero.srcset, sizes: heroSizes } : undefined}
 >
   <section class="d-hero" aria-labelledby="d-title">
@@ -66,6 +70,7 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
       </div>
     </div>
   </section>
+  <Faq data={page.structuredData} />
 </Base>
 
 <style>
