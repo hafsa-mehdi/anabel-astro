@@ -25,7 +25,7 @@ const { hero, marquee, services, cleaning, repairs, reviews, visit } = home;
   imageAlt={services.cards[0]?.imageAlt}
   heroUnderHeader
   jsonLd={editorSchemas(home.structuredData, s, { extra: [localBusiness(s, absoluteImage(visitPage?.image, site))] })}
-  schemaOff={!!home.structuredData?.off}
+  structuredData={home.structuredData}
 >
   <!-- 1. Hero: headline, offer, and the 3D rug that unrolls under the buttons -->
   <section class="hero" aria-labelledby="hero-title">

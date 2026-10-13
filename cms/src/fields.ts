@@ -1,6 +1,8 @@
 // Shared field builders, mirroring the helpers at the top of ../keystatic.config.ts so both
 // admin panels ask for the same content with the same names (the Astro site reads either).
 import { slugField } from 'payload'
+import { checkCustomSchema } from './customSchema'
+import { GLOBAL_PATHS, siteUrl } from './livePreview'
 import type { ArrayField, Field, GroupField, RowField, SelectField, TabsField, TextField, TextareaField, UploadField } from 'payload'
 
 export const accentHelp = 'Wrap a word or two in *asterisks* to show them in gold italics, e.g. The *perfect* rug.'
@@ -127,6 +129,7 @@ export const seo = (pageName: string): GroupField => ({
  * Editor-controlled structured data (schema.org) for one page, shown in its SEO tab.
  * `pageType`: the page-type dropdown (pages whose main schema is a Service or an article).
  * `service`: service name, starting price and areas served (pages described as a Service).
+ * `custom`: hand-written JSON-LD (Level 3), checked on save by customSchema.ts.
  * Same names as structuredData() in keystatic.config.ts; src/lib/schema.ts turns it into JSON-LD.
  */
 export const structuredData = ({ pageType = false, service = false } = {}): GroupField =>
@@ -187,7 +190,37 @@ export const structuredData = ({ pageType = false, service = false } = {}): Grou
         label: 'Turn off automatic schema for this page',
         type: 'checkbox',
         defaultValue: false,
-        admin: { description: 'Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).' },
+        admin: {
+          description:
+            'Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.',
+        },
+      },
+      {
+        type: 'collapsible',
+        label: 'Custom schema (advanced)',
+        admin: {
+          initCollapsed: true,
+          description:
+            'For schema types the fields above do not cover, like Event, Product or VideoObject. Paste JSON-LD (without <script> tags): it is added to the page as it is, next to the automatic schema. Only describe what is really on the page. Leave empty if unsure.',
+        },
+        fields: [
+          {
+            name: 'custom',
+            label: 'Custom JSON-LD',
+            type: 'code',
+            admin: { language: 'json' },
+            validate: checkCustomSchema,
+          },
+          {
+            name: 'schemaTools',
+            type: 'ui',
+            admin: {
+              components: {
+                Field: { path: '/components/SchemaTools#SchemaTools', clientProps: { siteUrl: siteUrl(), globalPaths: GLOBAL_PATHS } },
+              },
+            },
+          },
+        ],
       },
     ],
     'Helps Google and AI search understand this page. Filled in automatically: only change what you need.',

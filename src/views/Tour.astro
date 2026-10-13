@@ -21,7 +21,7 @@ const posterSizes = '(min-width: 1280px) 1200px, 100vw';
   imageAlt={page.imageAlt}
   crumbs={[{ name: 'Showroom tour', url: '/tour/' }]}
   jsonLd={editorSchemas(page.structuredData, s)}
-  schemaOff={!!page.structuredData?.off}
+  structuredData={page.structuredData}
   preloadImage={poster ? { href: poster.fallback, srcset: poster.srcset, sizes: posterSizes } : undefined}
 >
   <section class="tour-hero" aria-labelledby="tour-title">

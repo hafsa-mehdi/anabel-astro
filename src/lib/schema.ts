@@ -149,6 +149,7 @@ export type StructuredData =
       startingPrice?: number | null;
       areaServed?: readonly (string | null)[] | null;
       off?: boolean | null;
+      custom?: string | null;
     }
   | null
   | undefined;
@@ -213,9 +214,9 @@ function pageEntity(type: PageType, page: PageInfo, sd: StructuredData, s: Setti
 }
 
 /**
- * The JSON-LD for a page: its main entity (`page`, in the type the editor picked), any fixed
- * extras (`extra`, e.g. the business on the homepage) and the FAQ. Nothing when the editor
- * turned schema off (Base.astro then leaves out the breadcrumbs too).
+ * The automatic JSON-LD for a page: its main entity (`page`, in the type the editor picked), any
+ * fixed extras (`extra`, e.g. the business on the homepage) and the FAQ. Nothing when the editor
+ * turned schema off (Base.astro then leaves out the breadcrumbs too, and adds the custom schema).
  */
 export function editorSchemas(sd: StructuredData, s: Settings, opts: { page?: PageInfo; extra?: object[] } = {}): object[] {
   if (sd?.off) return [];
@@ -228,4 +229,32 @@ export function editorSchemas(sd: StructuredData, s: Settings, opts: { page?: Pa
   const faq = faqItems(sd);
   if (faq.length) out.push(faqPage(faq));
   return out;
+}
+
+/**
+ * The editor's "Custom schema (advanced)" text → JSON-LD blocks. Same checks as the CMS runs on
+ * save (cms/src/customSchema.ts); Keystatic cannot check on save, so a mistake that reaches the
+ * build stops it (Base.astro throws with a message naming the page; the live preview only warns).
+ */
+export function parseCustomSchema(text: string | null | undefined): { blocks: object[]; error?: string } {
+  const raw = text?.trim();
+  if (!raw) return { blocks: [] };
+  if (/<[a-z/!]/i.test(raw)) return { blocks: [], error: 'it contains HTML tags (paste only the JSON, without <script>)' };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    return { blocks: [], error: `it is not valid JSON (${(err as Error).message})` };
+  }
+  const blocks = Array.isArray(parsed) ? parsed : [parsed];
+  for (const block of blocks) {
+    const b = block as Record<string, unknown> | null;
+    if (!b || typeof b !== 'object' || Array.isArray(b)) return { blocks: [], error: 'every block must be a { … } object' };
+    if (typeof b['@context'] !== 'string' || !b['@context'].includes('schema.org')) return { blocks: [], error: 'a block has no "@context": "https://schema.org"' };
+    const types = ([] as unknown[]).concat(b['@type']);
+    if (!types.every((t) => typeof t === 'string' && t.trim())) return { blocks: [], error: 'a block has no "@type"' };
+    if (types.includes('FAQPage')) return { blocks: [], error: 'it contains FAQ schema (use the FAQ list instead)' };
+    if (types.includes('BreadcrumbList')) return { blocks: [], error: 'it contains breadcrumb schema (made automatically)' };
+  }
+  return { blocks: blocks as object[] };
 }

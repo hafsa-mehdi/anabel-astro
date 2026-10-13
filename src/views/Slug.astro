@@ -56,7 +56,7 @@ const repairHero = repair ? imageInfo(repair.heroImage) : null;
           image: absoluteImage(repair.heroImage, site),
         },
       })}
-      schemaOff={!!repair.structuredData?.off}
+      structuredData={repair.structuredData}
     >
       <RepairPage
         slug={slug}
@@ -94,7 +94,7 @@ const repairHero = repair ? imageInfo(repair.heroImage) : null;
           date: post.data.pubDate,
         },
       })}
-      schemaOff={!!post.data.structuredData?.off}
+      structuredData={post.data.structuredData}
     >
       <PostPage
         post={post}
@@ -128,7 +128,7 @@ const repairHero = repair ? imageInfo(repair.heroImage) : null;
           image: absoluteImage(area.heroImage, site),
         },
       })}
-      schemaOff={!!area.structuredData?.off}
+      structuredData={area.structuredData}
     >
       <AreaPage entry={area} />
     </Base>

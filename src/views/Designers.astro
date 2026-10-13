@@ -20,7 +20,7 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
   imageAlt={page.imageAlt}
   crumbs={[{ name: 'Designer program', url: '/designer-program/' }]}
   jsonLd={editorSchemas(page.structuredData, s)}
-  schemaOff={!!page.structuredData?.off}
+  structuredData={page.structuredData}
   preloadImage={hero ? { href: hero.fallback, srcset: hero.srcset, sizes: heroSizes } : undefined}
 >
   <section class="d-hero" aria-labelledby="d-title">

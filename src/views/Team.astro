@@ -20,7 +20,7 @@ const storySizes = '(min-width: 1024px) 40vw, min(20rem, 90vw)';
   imageAlt={page.story.imageAlt}
   crumbs={[{ name: 'Meet the team', url: '/team/' }]}
   jsonLd={editorSchemas(page.structuredData, s)}
-  schemaOff={!!page.structuredData?.off}
+  structuredData={page.structuredData}
 >
   <section class="t-hero" aria-labelledby="t-title">
     <div class="glow" aria-hidden="true"></div>

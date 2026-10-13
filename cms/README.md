@@ -81,6 +81,9 @@ Optional: CMS project > Settings > Git > Ignored Build Step:
   into its FAQPage schema, plus (repairs, service areas, cleaning, posts) the page type for
   Google and service details, and a switch to turn schema off. Business details for Google
   (description, price range, photo) are in Site settings. `src/lib/schema.ts` builds the JSON-LD.
+- **Custom schema (advanced)** at the bottom of the same group: hand-written JSON-LD, checked on
+  save (`src/customSchema.ts`: valid JSON, @context/@type, no HTML, no FAQ/breadcrumb copies),
+  with links to Google's Rich Results Test and the schema.org validator for the published page.
 - **Branding:** Anabel's wordmark and the site's dark colours; "View website" in the top bar
   (`SITE_URL`, defaults to the Payload version of the site).
 

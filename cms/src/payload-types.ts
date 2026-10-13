@@ -246,9 +246,10 @@ export interface Repair {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -357,9 +358,10 @@ export interface Area {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -428,9 +430,10 @@ export interface Post {
      */
     type?: ('auto' | 'Service' | 'Article' | 'BlogPosting' | 'WebPage') | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -621,6 +624,7 @@ export interface RepairsSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -670,6 +674,7 @@ export interface AreasSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -701,6 +706,7 @@ export interface PostsSelect<T extends boolean = true> {
             };
         type?: T;
         off?: T;
+        custom?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -976,9 +982,10 @@ export interface Home {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1096,9 +1103,10 @@ export interface Cleaning {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1160,9 +1168,10 @@ export interface Visit {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1238,9 +1247,10 @@ export interface Team {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1295,9 +1305,10 @@ export interface Tour {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1371,9 +1382,10 @@ export interface Designer {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1415,9 +1427,10 @@ export interface Blog {
         }[]
       | null;
     /**
-     * Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).
+     * Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.
      */
     off?: boolean | null;
+    custom?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -1730,6 +1743,7 @@ export interface HomeSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1811,6 +1825,7 @@ export interface CleaningSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1854,6 +1869,7 @@ export interface VisitSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1902,6 +1918,7 @@ export interface TeamSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1936,6 +1953,7 @@ export interface TourSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -1985,6 +2003,7 @@ export interface DesignersSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   _status?: T;
   updatedAt?: T;
@@ -2015,6 +2034,7 @@ export interface BlogSelect<T extends boolean = true> {
               id?: T;
             };
         off?: T;
+        custom?: T;
       };
   _status?: T;
   updatedAt?: T;

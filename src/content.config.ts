@@ -41,6 +41,7 @@ const posts = defineCollection({
           faq: z.array(z.object({ question: z.string().nullish(), answer: z.string().nullish() })).nullish(),
           type: z.string().nullish(),
           off: z.boolean().nullish(),
+          custom: z.string().nullish(),
         })
         .nullish(),
     }),

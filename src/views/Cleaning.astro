@@ -42,7 +42,7 @@ const heroSizes = '(min-width: 1024px) 50vw, 100vw';
       image: absoluteImage(page.heroImage, site),
     },
   })}
-  schemaOff={!!page.structuredData?.off}
+  structuredData={page.structuredData}
   preloadImage={hero ? { href: hero.fallback, srcset: hero.srcset, sizes: heroSizes } : undefined}
 >
   <section class="c-hero" aria-labelledby="c-title">

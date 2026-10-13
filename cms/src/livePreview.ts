@@ -10,10 +10,10 @@
 import crypto from 'node:crypto'
 import type { Endpoint, LivePreviewConfig } from 'payload'
 
-const siteUrl = () => (process.env.SITE_URL || 'https://anabel-astro-payload.vercel.app').replace(/\/$/, '')
+export const siteUrl = () => (process.env.SITE_URL || 'https://anabel-astro-payload.vercel.app').replace(/\/$/, '')
 
 // Which website page shows each one-off page
-const GLOBAL_PATHS: Record<string, string> = {
+export const GLOBAL_PATHS: Record<string, string> = {
   settings: '',
   home: '',
   cleaning: 'louisville-rug-cleaning',

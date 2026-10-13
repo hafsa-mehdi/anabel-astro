@@ -3,8 +3,8 @@ import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import { getSettings, absoluteImage } from '../lib/cms';
-import { breadcrumbs as crumbSchema } from '../lib/schema';
+import { getSettings, absoluteImage, isPreview } from '../lib/cms';
+import { breadcrumbs as crumbSchema, parseCustomSchema, type StructuredData } from '../lib/schema';
 import '../styles/global.css';
 
 interface Props {
@@ -15,8 +15,8 @@ interface Props {
   imageAlt?: string;
   type?: 'website' | 'article';
   jsonLd?: object[];
-  /** The editor turned structured data off for this page: no JSON-LD at all, not even breadcrumbs. */
-  schemaOff?: boolean;
+  /** The page's "Structured data" fields: off (no automatic schema, not even breadcrumbs) and custom JSON-LD. */
+  structuredData?: StructuredData;
   /** Inner pages: [{ name, url }]. Home is added automatically. */
   crumbs?: { name: string; url: string }[];
   noindex?: boolean;
@@ -33,7 +33,7 @@ const {
   imageAlt,
   type = 'website',
   jsonLd = [],
-  schemaOff = false,
+  structuredData,
   crumbs,
   noindex: pageNoindex = false,
   preloadImage,
@@ -50,7 +50,16 @@ const ogImage =
   (image?.startsWith('http') ? image : absoluteImage(image, site)) ??
   absoluteImage('/images/uploads/home/services/cards/0/image.webp', site);
 const trail = crumbs ? [{ name: 'Home', url: '/' }, ...crumbs] : null;
-const schemas = schemaOff ? [] : [...jsonLd, ...(trail ? [crumbSchema(trail)] : [])];
+const custom = parseCustomSchema(structuredData?.custom);
+if (custom.error) {
+  const problem = `The custom schema on ${Astro.url.pathname} has a problem: ${custom.error}. Fix it in the CMS (SEO tab → Custom schema).`;
+  // Live preview shows drafts, which the CMS only checks on publish
+  if (!isPreview()) throw new Error(problem);
+  console.warn(problem);
+}
+const schemas = [...jsonLd, ...(trail && !structuredData?.off ? [crumbSchema(trail)] : []), ...custom.blocks];
+// "<" is escaped so no text inside the JSON (e.g. "</script>") can end the script tag early
+const jsonLdHtml = (o: object) => JSON.stringify(o).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -95,7 +104,7 @@ const schemas = schemaOff ? [] : [...jsonLd, ...(trail ? [crumbSchema(trail)] : 
     <meta name="twitter:description" content={description} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
 
-    {schemas.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+    {schemas.map((o) => <script type="application/ld+json" set:html={jsonLdHtml(o)} />)}
 
     <ClientRouter fallback="swap" />
     <slot name="head" />

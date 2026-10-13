@@ -59,6 +59,7 @@ const seo = (pageName: string) =>
 // Editor-controlled structured data (schema.org) for one page. Same names as structuredData()
 // in cms/src/fields.ts; src/lib/schema.ts turns it into JSON-LD.
 //  pageType: the page-type dropdown. service: service name, starting price, areas served.
+//  custom: hand-written JSON-LD (Level 3). Keystatic cannot check it on save; the build does.
 const structuredData = ({ pageType = false, service = false } = {}) =>
   fields.object(
     {
@@ -107,8 +108,15 @@ const structuredData = ({ pageType = false, service = false } = {}) =>
         : {}),
       off: fields.checkbox({
         label: 'Turn off automatic schema for this page',
-        description: 'Rarely needed. The page will then have no structured data at all (the FAQ still shows on the page).',
+        description:
+          'Rarely needed. Removes the automatic schema and the FAQ schema (the FAQ still shows on the page). Custom schema below is kept.',
         defaultValue: false,
+      }),
+      custom: fields.text({
+        label: 'Custom schema (advanced)',
+        description:
+          'For schema types the fields above do not cover, like Event, Product or VideoObject. Paste JSON-LD (without <script> tags): it is added to the page as it is. Only describe what is really on the page. A mistake here stops the website from updating until it is fixed, so leave it empty if unsure.',
+        multiline: true,
       }),
     },
     {

@@ -29,7 +29,7 @@ const areaCards = s.serviceAreas.map((a) => {
   imageAlt={page.imageAlt}
   crumbs={[{ name: 'Visit & contact', url: '/contact/' }]}
   jsonLd={editorSchemas(page.structuredData, s, { extra: [localBusiness(s, absoluteImage(page.image, site))] })}
-  schemaOff={!!page.structuredData?.off}
+  structuredData={page.structuredData}
   preloadImage={photo ? { href: photo.fallback, srcset: photo.srcset, sizes: photoSizes } : undefined}
 >
   <section class="v-hero" aria-labelledby="v-title">
